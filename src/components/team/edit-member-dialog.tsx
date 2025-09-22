@@ -32,6 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import { ImageCropperDialog } from "./image-cropper-dialog"
 
 const memberFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -55,6 +56,8 @@ export function EditMemberDialog({
   onUpdateMember,
   user
 }: EditMemberDialogProps) {
+  const [imageToCrop, setImageToCrop] = React.useState<string | null>(null);
+
   const form = useForm<MemberFormValues>({
     resolver: zodResolver(memberFormSchema),
     defaultValues: {
@@ -85,100 +88,114 @@ export function EditMemberDialog({
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        form.setValue('avatar', reader.result as string);
+        setImageToCrop(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
   };
 
+  const onCropComplete = (croppedImageUrl: string) => {
+    form.setValue('avatar', croppedImageUrl);
+    setImageToCrop(null);
+  };
+
   const currentAvatar = form.watch('avatar');
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Edit Team Member</DialogTitle>
-          <DialogDescription>
-            Update the details for {user.name}.
-          </DialogDescription>
-        </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Full Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., John Doe" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Role</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., Frontend Developer" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="availability"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Availability</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Team Member</DialogTitle>
+            <DialogDescription>
+              Update the details for {user.name}.
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Full Name</FormLabel>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select availability" />
-                      </SelectTrigger>
+                      <Input placeholder="e.g., John Doe" {...field} />
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Available">Available</SelectItem>
-                      <SelectItem value="Busy">Busy</SelectItem>
-                      <SelectItem value="On Vacation">On Vacation</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormItem>
-                <FormLabel>Avatar</FormLabel>
-                <div className="flex items-center gap-4">
-                    <Avatar className="h-16 w-16">
-                        <AvatarImage src={currentAvatar} alt={user.name} />
-                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Role</FormLabel>
                     <FormControl>
-                        <Input 
-                            type="file" 
-                            accept="image/*" 
-                            onChange={handleAvatarChange} 
-                            className="flex-1"
-                        />
+                      <Input placeholder="e.g., Frontend Developer" {...field} />
                     </FormControl>
-                </div>
-                <FormMessage />
-            </FormItem>
-            <DialogFooter>
-              <Button type="button" variant="ghost" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button type="submit">Save Changes</Button>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="availability"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Availability</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select availability" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Available">Available</SelectItem>
+                        <SelectItem value="Busy">Busy</SelectItem>
+                        <SelectItem value="On Vacation">On Vacation</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormItem>
+                  <FormLabel>Avatar</FormLabel>
+                  <div className="flex items-center gap-4">
+                      <Avatar className="h-16 w-16">
+                          <AvatarImage src={currentAvatar} alt={user.name} />
+                          <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <FormControl>
+                          <Input 
+                              type="file" 
+                              accept="image/*" 
+                              onChange={handleAvatarChange} 
+                              className="flex-1"
+                          />
+                      </FormControl>
+                  </div>
+                  <FormMessage />
+              </FormItem>
+              <DialogFooter>
+                <Button type="button" variant="ghost" onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button type="submit">Save Changes</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+      {imageToCrop && (
+        <ImageCropperDialog
+          image={imageToCrop}
+          onClose={() => setImageToCrop(null)}
+          onSave={onCropComplete}
+        />
+      )}
+    </>
   )
 }
