@@ -62,7 +62,7 @@ export const projects: Project[] = [
     tasks: [
       { id: 'task-2-1', title: 'User research and wireframing', status: 'Done', assigned: [users[2]], startDate: new Date('2024-07-01'), dueDate: new Date('2024-07-15'), dependencies: [] },
       { id: 'task-2-2', title: 'Create component library', status: 'In Progress', assigned: [users[0]], startDate: new Date('2024-07-16'), dueDate: new  Date('2024-07-28'), dependencies: ['task-2-1'] },
-      { id: 'task-2-3', title: 'Implement fund transfer feature', status: 'To-Do', assigned: [], startDate: new Date('2024-08-01'), dueDate: new Date('2024-08-15'), dependencies: ['task-2-2'] },
+      { id: 'task-2-3', title: 'Implement fund transfer feature', status: 'To-Do', assigned: [], startDate: new Date('204-08-01'), dueDate: new Date('2024-08-15'), dependencies: ['task-2-2'] },
       { id: 'task-2-4', title: 'Performance testing on Android', status: 'Backlog', assigned: [], dependencies: ['task-2-3'] },
     ],
   },
@@ -110,7 +110,7 @@ export const workspaces: Workspace[] = [
       { id: 'qn-1-2', title: 'Punic Wars Summary', content: 'Series of three wars fought between Rome and Carthage.' },
       { id: 'qn-1-3', title: 'Fall of the Republic', content: 'Internal turmoil, civil wars, and the rise of Julius Caesar.' },
     ],
-    spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DX84kJlLzHUB2',
+    youtubeUrl: 'https://www.youtube.com/watch?v=videoseries?list=PL1pcp2D0gE1a0W7sCg0h3-V-g3-vj3sAb',
   },
   {
     id: 'ws-2',
@@ -122,6 +122,6 @@ export const workspaces: Workspace[] = [
       { id: 'qn-2-1', title: 'Schrödinger Equation', content: 'Describes how the quantum state of a quantum system changes with time.' },
       { id: 'qn-2-2', title: 'Heisenberg Uncertainty', content: 'A fundamental limit to the precision with which certain pairs of physical properties can be known.' },
     ],
-    spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DX84kJlLzHUB2',
+    youtubeUrl: 'https://www.youtube.com/watch?v=I-D3kXgGq8c',
   },
 ];

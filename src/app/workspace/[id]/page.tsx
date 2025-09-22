@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { use } from "react"
 import Image from "next/image"
 import {
   Archive,
@@ -12,7 +11,7 @@ import {
   BookOpen,
   Calendar,
   User,
-  Music,
+  Youtube,
   StickyNote,
   MoreHorizontal,
   PlusCircle,
@@ -51,7 +50,7 @@ import { NoteDialog } from "@/components/workspace/note-dialog"
 import { useWorkspace } from "@/context/workspace-context"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { SaveNoteDialog } from "@/components/workspace/save-note-dialog"
-import { SpotifyLinkDialog } from "@/components/workspace/spotify-link-dialog"
+import { YouTubeLinkDialog } from "@/components/workspace/youtube-link-dialog"
 
 function WorkspaceDetail({ id }: { id: string }) {
   const [isCollapsed, setIsCollapsed] = React.useState(false)
@@ -60,7 +59,7 @@ function WorkspaceDetail({ id }: { id: string }) {
   const [selectedNote, setSelectedNote] = React.useState<QuickNote | null>(null)
   const [mainNote, setMainNote] = React.useState('');
   const [isSaveNoteDialogOpen, setIsSaveNoteDialogOpen] = React.useState(false);
-  const [isSpotifyLinkDialogOpen, setIsSpotifyLinkDialogOpen] = React.useState(false);
+  const [isYouTubeLinkDialogOpen, setIsYouTubeLinkDialogOpen] = React.useState(false);
 
 
   React.useEffect(() => {
@@ -96,19 +95,42 @@ function WorkspaceDetail({ id }: { id: string }) {
     }
   }
 
-  const handleSaveSpotifyLink = (link: string) => {
+  const handleSaveYouTubeLink = (link: string) => {
     if (workspace) {
-      updateWorkspace({ ...workspace, spotifyPlaylistUrl: link });
+      updateWorkspace({ ...workspace, youtubeUrl: link });
     }
   };
 
-  const getSpotifyEmbedUrl = (url: string | undefined): string => {
-    if (!url || !url.includes('spotify.com/playlist/')) {
-        return "https://open.spotify.com/embed/playlist/37i9dQZF1DX84kJlLzHUB2?utm_source=generator";
+ const getYouTubeEmbedUrl = (url: string | undefined): string => {
+    if (!url) {
+      return "https://www.youtube.com/embed/jfKfPfyJRdk"; // Default video
     }
-    const embedUrl = url.replace('/playlist/', '/embed/playlist/');
-    return embedUrl;
-  }
+
+    let videoId: string | null = null;
+    try {
+      const urlObj = new URL(url);
+      if (urlObj.hostname === 'youtu.be') {
+        videoId = urlObj.pathname.slice(1);
+      } else if (urlObj.hostname === 'www.youtube.com' || urlObj.hostname === 'youtube.com') {
+        if (urlObj.pathname === '/watch') {
+          videoId = urlObj.searchParams.get('v');
+        } else if (urlObj.pathname.startsWith('/embed/')) {
+          videoId = urlObj.pathname.split('/')[2];
+        } else if (urlObj.pathname.startsWith('/live/')) {
+          videoId = urlObj.pathname.split('/')[2];
+        }
+      }
+    } catch (error) {
+       return "https://www.youtube.com/embed/jfKfPfyJRdk";
+    }
+
+    if (videoId) {
+      return `https://www.youtube.com/embed/${videoId}`;
+    }
+
+    return "https://www.youtube.com/embed/jfKfPfyJRdk";
+  };
+
 
   if (!workspace) {
     return (
@@ -222,23 +244,21 @@ function WorkspaceDetail({ id }: { id: string }) {
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between">
                             <div>
-                                <CardTitle className="flex items-center gap-2"><Music /> Spotify</CardTitle>
-                                <CardDescription>Your study playlist.</CardDescription>
+                                <CardTitle className="flex items-center gap-2"><Youtube /> YouTube</CardTitle>
+                                <CardDescription>Your study video/playlist.</CardDescription>
                             </div>
-                            <Button variant="ghost" size="icon" onClick={() => setIsSpotifyLinkDialogOpen(true)}>
+                            <Button variant="ghost" size="icon" onClick={() => setIsYouTubeLinkDialogOpen(true)}>
                                 <Pencil className="h-4 w-4" />
                             </Button>
                         </CardHeader>
                         <CardContent>
                              <iframe 
-                                style={{ borderRadius: "12px" }}
-                                src={getSpotifyEmbedUrl(workspace.spotifyPlaylistUrl)}
-                                width="100%" 
-                                height="352" 
+                                className="w-full aspect-video rounded-lg"
+                                src={getYouTubeEmbedUrl(workspace.youtubeUrl)}
+                                title="YouTube video player"
                                 frameBorder="0" 
-                                allowFullScreen={true} 
-                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                                loading="lazy">
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                allowFullScreen>
                             </iframe>
                         </CardContent>
                     </Card>
@@ -310,17 +330,32 @@ function WorkspaceDetail({ id }: { id: string }) {
           onClose={() => setIsSaveNoteDialogOpen(false)}
           onSave={handleSaveAsQuickNote}
       />
-      <SpotifyLinkDialog
-        isOpen={isSpotifyLinkDialogOpen}
-        onClose={() => setIsSpotifyLinkDialogOpen(false)}
-        onSave={handleSaveSpotifyLink}
-        currentUrl={workspace.spotifyPlaylistUrl}
+      <YouTubeLinkDialog
+        isOpen={isYouTubeLinkDialogOpen}
+        onClose={() => setIsYouTubeLinkDialogOpen(false)}
+        onSave={handleSaveYouTubeLink}
+        currentUrl={workspace.youtubeUrl}
       />
     </SidebarProvider>
   )
 }
 
 export default function WorkspaceDetailPage({ params }: { params: { id: string } }) {
-  const { id } = use(Promise.resolve(params));
+  const [id, setId] = React.useState<string>('');
+  
+  React.useEffect(() => {
+    // This effect runs only on the client, after hydration
+    setId(params.id);
+  }, [params]);
+
+  if (!id) {
+    // You can render a loading state here
+    return (
+        <div className="flex items-center justify-center h-screen">
+            <p>Loading workspace...</p>
+        </div>
+    );
+  }
+
   return <WorkspaceDetail id={id} />
 }

@@ -26,7 +26,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         { id: `qn-${newIdSuffix}-2`, title: 'Resources', content: '- Book/Chapter\n- Website URL' },
         { id: `qn-${newIdSuffix}-3`, title: 'Action Items', content: '- [ ] Read chapter 5\n- [ ] Review lecture notes' },
       ],
-      spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DX84kJlLzHUB2'
+      youtubeUrl: 'https://www.youtube.com/watch?v=jfKfPfyJRdk'
     };
     setWorkspaces(prev => [newWorkspace, ...prev]);
   };

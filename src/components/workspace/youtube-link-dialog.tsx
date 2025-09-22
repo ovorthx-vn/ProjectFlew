@@ -24,32 +24,32 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 
-const spotifyLinkFormSchema = z.object({
+const youtubeLinkFormSchema = z.object({
   url: z.string().url("Please enter a valid URL.").refine(
-    (url) => url.includes("open.spotify.com/playlist/"),
-    "Please enter a valid Spotify playlist URL."
+    (url) => url.includes("youtube.com/") || url.includes("youtu.be/"),
+    "Please enter a valid YouTube URL."
   ),
 })
 
-type SpotifyLinkFormValues = z.infer<typeof spotifyLinkFormSchema>
+type YouTubeLinkFormValues = z.infer<typeof youtubeLinkFormSchema>
 
-interface SpotifyLinkDialogProps {
+interface YouTubeLinkDialogProps {
   isOpen: boolean
   onClose: () => void
   onSave: (url: string) => void
   currentUrl?: string
 }
 
-export function SpotifyLinkDialog({
+export function YouTubeLinkDialog({
   isOpen,
   onClose,
   onSave,
   currentUrl,
-}: SpotifyLinkDialogProps) {
+}: YouTubeLinkDialogProps) {
     const { toast } = useToast()
 
-  const form = useForm<SpotifyLinkFormValues>({
-    resolver: zodResolver(spotifyLinkFormSchema),
+  const form = useForm<YouTubeLinkFormValues>({
+    resolver: zodResolver(youtubeLinkFormSchema),
     defaultValues: {
       url: currentUrl || "",
     },
@@ -61,11 +61,11 @@ export function SpotifyLinkDialog({
     }
   }, [isOpen, currentUrl, form])
 
-  function onSubmit(data: SpotifyLinkFormValues) {
+  function onSubmit(data: YouTubeLinkFormValues) {
     onSave(data.url);
     toast({
-        title: "Playlist updated!",
-        description: "Your study playlist has been changed."
+        title: "YouTube video updated!",
+        description: "Your study video has been changed."
     })
     onClose();
   }
@@ -74,9 +74,9 @@ export function SpotifyLinkDialog({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Set Spotify Playlist</DialogTitle>
+          <DialogTitle>Set YouTube Video/Playlist</DialogTitle>
           <DialogDescription>
-            Paste the URL of a Spotify playlist to embed it in your workspace.
+            Paste the URL of a YouTube video or playlist to embed it in your workspace.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -86,9 +86,9 @@ export function SpotifyLinkDialog({
               name="url"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Playlist URL</FormLabel>
+                  <FormLabel>YouTube URL</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://open.spotify.com/playlist/..." {...field} />
+                    <Input placeholder="https://www.youtube.com/watch?v=..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
