@@ -1,10 +1,10 @@
-import type { Project, User } from './types';
+import type { Project, User, Workspace } from './types';
 
 export const users: User[] = [
   { id: 'user-1', name: 'Liam Johnson', avatar: 'https://picsum.photos/seed/user1/40/40', role: 'Frontend Developer', availability: 'Available' },
   { id: 'user-2', name: 'Olivia Smith', avatar: 'https://picsum.photos/seed/user2/40/40', role: 'Backend Developer', availability: 'Busy' },
   { id: 'user-3', name: 'Noah Williams', avatar: 'https://picsum.photos/seed/user3/40/40', role: 'UI/UX Designer', availability: 'Available' },
-  { id: 'user-4', name: 'Emma Brown', avatar: 'https://picsum.photos/seed/user4/40/40', role: 'Project Manager', availability: 'On Vacation' },
+  { id: 'user-4', name: 'Emma Brown', avatar: 'https://picsum.photos/seed/user4/40/40', role: 'Project Manager', availability: 'Available' },
   { id: 'user-5', name: 'Ava Jones', avatar: 'https://picsum.photos/seed/user5/40/40', role: 'QA Tester', availability: 'Available' },
 ];
 
@@ -94,6 +94,32 @@ export const projects: Project[] = [
     completionNote: '',
     tasks: [
         { id: 'task-4-1', title: 'Define requirements', status: 'In Progress', assigned: [users[3]], startDate: new Date('2024-07-18'), dueDate: new Date('2024-07-25') }
+    ],
+  },
+];
+
+export const workspaces: Workspace[] = [
+  {
+    id: 'ws-1',
+    subject: 'History of Ancient Rome',
+    tutor: 'Dr. Eleanor Vance',
+    dueDate: new Date('2024-10-15'),
+    mainNote: '',
+    quickNotes: [
+      { id: 'qn-1-1', title: 'Key Emperors', content: 'Augustus, Trajan, Marcus Aurelius, Constantine.' },
+      { id: 'qn-1-2', title: 'Punic Wars Summary', content: 'Series of three wars fought between Rome and Carthage.' },
+      { id: 'qn-1-3', title: 'Fall of the Republic', content: 'Internal turmoil, civil wars, and the rise of Julius Caesar.' },
+    ],
+  },
+  {
+    id: 'ws-2',
+    subject: 'Quantum Physics I',
+    tutor: 'Prof. Alistair Finch',
+    dueDate: new Date('2024-11-05'),
+    mainNote: '',
+    quickNotes: [
+      { id: 'qn-2-1', title: 'Schrödinger Equation', content: 'Describes how the quantum state of a quantum system changes with time.' },
+      { id: 'qn-2-2', title: 'Heisenberg Uncertainty', content: 'A fundamental limit to the precision with which certain pairs of physical properties can be known.' },
     ],
   },
 ];

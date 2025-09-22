@@ -32,3 +32,18 @@ export type Project = {
   mindMap?: string;
   completionNote?: string;
 };
+
+export type QuickNote = {
+  id: string;
+  title: string;
+  content: string;
+};
+
+export type Workspace = {
+  id: string;
+  subject: string;
+  tutor: string;
+  dueDate: Date;
+  mainNote: string;
+  quickNotes: QuickNote[];
+};
