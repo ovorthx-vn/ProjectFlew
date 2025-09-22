@@ -87,7 +87,7 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                 </div>
 
                 {/* Projects */}
-                <div className="space-y-2">
+                <div className="relative">
                 {projects.map((project, index) => {
                     const left = differenceInDays(project.createdAt, startDate) * 3
                     const width = differenceInDays(project.dueDate, project.createdAt) * 3
@@ -96,10 +96,8 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                     <Tooltip key={project.id} delayDuration={100}>
                         <TooltipTrigger asChild>
                         <div
-                            className="relative h-8 rounded-lg flex items-center px-2 cursor-pointer"
+                            className="relative h-8 rounded-lg flex items-center px-2 cursor-pointer mb-2"
                             style={{
-                            position: "absolute",
-                            top: `${index * 40}px`,
                             left: `${left}px`,
                             width: `${width}px`,
                             backgroundColor: `hsl(var(--primary) / 0.2)`,
@@ -120,7 +118,6 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                     )
                 })}
                 </div>
-                <div style={{ height: `${projects.length * 40}px` }}></div>
             </div>
             </TooltipProvider>
         </div>
