@@ -12,7 +12,6 @@ import {
   PlusCircle
 } from "lucide-react"
 
-import { users as initialUsers } from "@/lib/data"
 import type { User } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -44,19 +43,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { CreateMemberDialog } from "@/components/settings/create-member-dialog"
 
-export default function SettingsPage() {
-  const [users, setUsers] = React.useState<User[]>(initialUsers)
+interface SettingsPageProps {
+  users: User[];
+  addUser: (user: Omit<User, 'id' | 'avatar'>) => void;
+}
+
+export default function SettingsPage({ users, addUser }: SettingsPageProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(false)
   const [isCreateMemberOpen, setIsCreateMemberOpen] = React.useState(false)
-
-  const addUser = (user: Omit<User, 'id' | 'avatar'>) => {
-    const newUser: User = {
-      ...user,
-      id: `user-${Date.now()}`,
-      avatar: `https://picsum.photos/seed/user${Date.now()}/40/40`,
-    }
-    setUsers(prev => [newUser, ...prev]);
-  }
 
   return (
     <SidebarProvider defaultOpen onOpenChange={(open) => setIsCollapsed(!open)}>
@@ -221,7 +215,7 @@ export default function SettingsPage() {
           </div>
         </main>
       </SidebarInset>
-      <CreateMemberDialog isOpen={isCreateMemberOpen} onClose={() => setIsCreateMemberOpen(false)} onAddMember={addUser} />
+      <CreateMemberDialog isOpen={isCreateMemberOpen} onClose={() => setIsCreateMemberOpen(false)} onAddMember={(newUserData) => addUser({...newUserData, avatar: `https://picsum.photos/seed/user${Date.now()}/40/40`})} />
     </SidebarProvider>
   )
 }

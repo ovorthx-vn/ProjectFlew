@@ -35,48 +35,56 @@ const memberFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
   role: z.string().min(2, "Role must be at least 2 characters."),
   availability: z.enum(["Available", "Busy", "On Vacation"]),
+  avatar: z.string().url("Must be a valid URL"),
 })
 
 type MemberFormValues = z.infer<typeof memberFormSchema>
 
-interface CreateMemberDialogProps {
+interface EditMemberDialogProps {
   isOpen: boolean
   onClose: () => void
-  onAddMember: (data: Omit<UserType, 'id' | 'avatar'>) => void
+  onUpdateMember: (data: UserType) => void
+  user: UserType
 }
 
-export function CreateMemberDialog({
+export function EditMemberDialog({
   isOpen,
   onClose,
-  onAddMember,
-}: CreateMemberDialogProps) {
+  onUpdateMember,
+  user
+}: EditMemberDialogProps) {
   const form = useForm<MemberFormValues>({
     resolver: zodResolver(memberFormSchema),
     defaultValues: {
-      name: "",
-      role: "",
-      availability: "Available",
+      name: user.name,
+      role: user.role,
+      availability: user.availability,
+      avatar: user.avatar,
     },
   })
+  
+  React.useEffect(() => {
+    form.reset({
+      name: user.name,
+      role: user.role,
+      availability: user.availability,
+      avatar: user.avatar,
+    });
+  }, [user, form]);
+
 
   function onSubmit(data: MemberFormValues) {
-    onAddMember(data);
-    form.reset();
+    onUpdateMember({ ...user, ...data });
     onClose();
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => {
-        if (!open) {
-          form.reset();
-        }
-        onClose();
-    }}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Create New Team Member</DialogTitle>
+          <DialogTitle>Edit Team Member</DialogTitle>
           <DialogDescription>
-            Fill in the details below to add a new member to your team.
+            Update the details for {user.name}.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -129,11 +137,24 @@ export function CreateMemberDialog({
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="avatar"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Avatar URL</FormLabel>
+                  <FormControl>
+                    <Input placeholder="https://..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <DialogFooter>
               <Button type="button" variant="ghost" onClick={onClose}>
                 Cancel
               </Button>
-              <Button type="submit">Add Member</Button>
+              <Button type="submit">Save Changes</Button>
             </DialogFooter>
           </form>
         </Form>

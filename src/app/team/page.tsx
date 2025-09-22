@@ -8,9 +8,10 @@ import {
   Settings,
   User as UserIcon,
   Users as UsersIcon,
+  MoreHorizontal,
+  PlusCircle
 } from "lucide-react"
 
-import { users as initialUsers } from "@/lib/data"
 import type { User } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -39,11 +40,29 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { EditMemberDialog } from "@/components/team/edit-member-dialog"
+import { CreateMemberDialog } from "@/components/settings/create-member-dialog"
 
-export default function TeamPage() {
-  const [users, setUsers] = React.useState<User[]>(initialUsers)
+interface TeamPageProps {
+  users: User[];
+  addUser: (user: Omit<User, 'id'>) => void;
+  updateUser: (user: User) => void;
+}
+
+export default function TeamPage({ users, addUser, updateUser }: TeamPageProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(false)
+  const [editingUser, setEditingUser] = React.useState<User | null>(null);
+  const [isCreateMemberOpen, setIsCreateMemberOpen] = React.useState(false)
 
+  const handleEditUser = (user: User) => {
+    setEditingUser(user);
+  };
+
+  const handleUpdateUser = (updatedUser: User) => {
+    updateUser(updatedUser);
+  };
+  
   return (
     <SidebarProvider defaultOpen onOpenChange={(open) => setIsCollapsed(!open)}>
       <Sidebar
@@ -130,37 +149,88 @@ export default function TeamPage() {
             <h1 className="font-headline text-xl font-semibold">Team</h1>
           </div>
           <div className="flex items-center gap-2">
+            <Button onClick={() => setIsCreateMemberOpen(true)}>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Add Member
+            </Button>
             <ThemeToggle />
           </div>
         </header>
         <main className="flex-1 p-4 sm:p-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {users.map((user) => (
-                <Card key={user.id}>
-                    <CardContent className="p-6 flex flex-col items-center text-center">
-                        <Avatar className="w-20 h-20 mb-4">
-                            <AvatarImage src={user.avatar} alt={user.name} />
-                            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <h3 className="text-lg font-semibold">{user.name}</h3>
-                        <p className="text-sm text-muted-foreground">{user.role}</p>
-                         <Badge 
-                            variant={user.availability === 'Available' ? 'secondary' : 'default'}
-                            className={cn(
-                                'mt-4',
-                                user.availability === 'Available' ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300' : 
-                                user.availability === 'Busy' ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300' : 
-                                'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300'
-                            )}
-                        >
-                            {user.availability}
-                        </Badge>
-                    </CardContent>
-                </Card>
-            ))}
-          </div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Team Members</CardTitle>
+                <CardDescription>Manage your team members.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Role</TableHead>
+                      <TableHead>Availability</TableHead>
+                      <TableHead><span className="sr-only">Actions</span></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {users.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Avatar>
+                              <AvatarImage src={user.avatar} alt={user.name} />
+                              <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            {user.name}
+                          </div>
+                        </TableCell>
+                        <TableCell>{user.role}</TableCell>
+                        <TableCell>
+                           <Badge 
+                                variant={user.availability === 'Available' ? 'secondary' : 'default'}
+                                className={cn(
+                                    user.availability === 'Available' ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300' : 
+                                    user.availability === 'Busy' ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300' : 
+                                    'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300'
+                                )}
+                            >
+                                {user.availability}
+                            </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuItem onClick={() => handleEditUser(user)}>Edit</DropdownMenuItem>
+                              <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
         </main>
       </SidebarInset>
+
+      <CreateMemberDialog isOpen={isCreateMemberOpen} onClose={() => setIsCreateMemberOpen(false)} onAddMember={(newUserData) => addUser({...newUserData, avatar: `https://picsum.photos/seed/user${Date.now()}/40/40`})} />
+
+      {editingUser && (
+        <EditMemberDialog
+          isOpen={!!editingUser}
+          onClose={() => setEditingUser(null)}
+          onUpdateMember={handleUpdateUser}
+          user={editingUser}
+        />
+      )}
     </SidebarProvider>
   )
 }

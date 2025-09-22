@@ -13,7 +13,7 @@ import {
 } from "lucide-react"
 import { format } from "date-fns"
 
-import { projects as initialProjects, users as initialUsers } from "@/lib/data"
+import { projects as initialProjects } from "@/lib/data"
 import type { Project, User, Task } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -49,9 +49,8 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 
-export default function DashboardPage() {
+export default function DashboardPage({ users }: { users: User[] }) {
   const [projects, setProjects] = React.useState<Project[]>(initialProjects);
-  const [users, setUsers] = React.useState<User[]>(initialUsers);
   const [isCollapsed, setIsCollapsed] = React.useState(false)
 
   const addProject = (project: Omit<Project, 'id' | 'createdAt' | 'tasks' | 'progress'>) => {
@@ -68,6 +67,19 @@ export default function DashboardPage() {
   const updateProject = (updatedProject: Project) => {
     setProjects(prev => prev.map(p => p.id === updatedProject.id ? updatedProject : p));
   }
+
+  React.useEffect(() => {
+    setProjects(currentProjects => {
+      return currentProjects.map(p => ({
+        ...p,
+        members: p.members.map(m => users.find(u => u.id === m.id) || m),
+        tasks: p.tasks.map(t => ({
+          ...t,
+          assigned: t.assigned.map(a => users.find(u => u.id === a.id) || a)
+        }))
+      }));
+    });
+  }, [users]);
   
   const allTasks = projects.flatMap(p => p.tasks.map(t => ({...t, project: p.name, projectId: p.id, projectDueDate: p.dueDate})));
   const tasksByDueDate = allTasks.reduce((acc, task) => {
@@ -91,7 +103,7 @@ export default function DashboardPage() {
           <PopoverTrigger asChild>
             <div className="relative">
               {format(day, 'd')}
-              <span className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
+              <span className="absolute top-0 right-0 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
             </div>
           </PopoverTrigger>
           <PopoverContent className="w-80">
