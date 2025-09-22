@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { use } from "react"
 import Image from "next/image"
 import {
   Archive,
@@ -52,7 +53,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { SaveNoteDialog } from "@/components/workspace/save-note-dialog"
 import { SpotifyLinkDialog } from "@/components/workspace/spotify-link-dialog"
 
-export default function WorkspaceDetailPage({ params }: { params: { id: string } }) {
+function WorkspaceDetail({ id }: { id: string }) {
   const [isCollapsed, setIsCollapsed] = React.useState(false)
   const { workspaces, updateWorkspace } = useWorkspace();
   const [workspace, setWorkspace] = React.useState<Workspace | null>(null);
@@ -63,12 +64,12 @@ export default function WorkspaceDetailPage({ params }: { params: { id: string }
 
 
   React.useEffect(() => {
-    const foundWorkspace = workspaces.find(ws => ws.id === params.id);
+    const foundWorkspace = workspaces.find(ws => ws.id === id);
     setWorkspace(foundWorkspace || null);
     if (foundWorkspace) {
       setMainNote(foundWorkspace.mainNote);
     }
-  }, [params, workspaces]);
+  }, [id, workspaces]);
 
   const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMainNote(e.target.value);
@@ -317,4 +318,9 @@ export default function WorkspaceDetailPage({ params }: { params: { id: string }
       />
     </SidebarProvider>
   )
+}
+
+export default function WorkspaceDetailPage({ params }: { params: { id: string } }) {
+  const { id } = use(Promise.resolve(params));
+  return <WorkspaceDetail id={id} />
 }
