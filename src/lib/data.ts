@@ -32,13 +32,13 @@ export const projects: Project[] = [
   {
     id: 'proj-1',
     name: 'E-commerce Platform',
+    startDate: new Date('2024-03-01'),
     dueDate: new Date('2024-12-15'),
     progress: 75,
     priority: 'High',
     members: [users[0], users[1], users[2]],
     notes: 'Initial notes for the e-commerce platform project.',
     mindMap: ecommerceMindMap,
-    createdAt: new Date('2024-03-01'),
     tasks: [
       { id: 'task-1-1', title: 'Design product page', status: 'Done', assigned: [users[2]], dueDate: new Date('2024-07-20'), priority: 'High' },
       { id: 'task-1-2', title: 'Develop authentication API', status: 'In Progress', assigned: [users[1]], dueDate: new Date('2024-07-25'), priority: 'High' },
@@ -50,11 +50,11 @@ export const projects: Project[] = [
   {
     id: 'proj-2',
     name: 'Mobile Banking App',
+    startDate: new Date('2024-05-10'),
     dueDate: new Date('2025-02-28'),
     progress: 40,
     priority: 'Urgent',
     members: [users[0], users[3], users[4]],
-    createdAt: new Date('2024-05-10'),
     notes: 'Focus on security and performance.',
     mindMap: '',
     tasks: [
@@ -67,11 +67,11 @@ export const projects: Project[] = [
   {
     id: 'proj-3',
     name: 'SaaS Analytics Dashboard',
+    startDate: new Date('2024-06-20'),
     dueDate: new Date('2025-01-20'),
     progress: 100,
     priority: 'Medium',
     members: [users[1], users[2], users[4]],
-    createdAt: new Date('2024-06-20'),
     mindMap: '',
     tasks: [
       { id: 'task-3-1', title: 'API for data aggregation', status: 'Done', assigned: [users[1]], priority: 'High' },
@@ -82,11 +82,11 @@ export const projects: Project[] = [
   {
     id: 'proj-4',
     name: 'Internal CRM Tool',
+    startDate: new Date('2024-08-01'),
     dueDate: new Date('2024-11-30'),
     progress: 15,
     priority: 'Low',
     members: [users[0], users[4]],
-    createdAt: new Date('2024-08-01'),
     mindMap: '',
     tasks: [
         { id: 'task-4-1', title: 'Define requirements', status: 'In Progress', assigned: [users[3]], dueDate: new Date('2024-07-22'), priority: 'Low' }

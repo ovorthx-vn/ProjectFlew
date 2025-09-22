@@ -7,7 +7,7 @@ import { useUser } from './user-context';
 
 type ProjectContextType = {
   projects: Project[];
-  addProject: (project: Omit<Project, 'id' | 'createdAt' | 'tasks' | 'progress' | 'mindMap'>) => void;
+  addProject: (project: Omit<Project, 'id' | 'tasks' | 'progress' | 'mindMap'>) => void;
   updateProject: (project: Project) => void;
 };
 
@@ -32,11 +32,10 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
   }, [users]);
 
 
-  const addProject = (project: Omit<Project, 'id' | 'createdAt' | 'tasks' | 'progress' | 'mindMap'>) => {
+  const addProject = (project: Omit<Project, 'id' | 'tasks' | 'progress' | 'mindMap'>) => {
     const newProject: Project = {
       ...project,
       id: `proj-${Date.now()}`,
-      createdAt: new Date(),
       tasks: [],
       progress: 0,
       mindMap: '',

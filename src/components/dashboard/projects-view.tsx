@@ -13,7 +13,7 @@ import { ProjectsTimeline } from "./projects-timeline"
 interface ProjectsViewProps {
   projects: Project[]
   users: User[]
-  onAddProject: (project: Omit<Project, 'id' | 'createdAt' | 'tasks' | 'progress' | 'mindMap'>) => void
+  onAddProject: (project: Omit<Project, 'id' | 'tasks' | 'progress' | 'mindMap'>) => void
   onUpdateProject: (project: Project) => void;
 }
 

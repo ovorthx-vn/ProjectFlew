@@ -21,6 +21,7 @@ export type Task = {
 export type Project = {
   id: string;
   name: string;
+  startDate: Date;
   dueDate: Date;
   progress: number;
   priority: Priority;
@@ -28,5 +29,4 @@ export type Project = {
   members: User[];
   notes?: string;
   mindMap?: string;
-  createdAt: Date;
 };

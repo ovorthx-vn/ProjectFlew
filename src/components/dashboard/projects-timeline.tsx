@@ -56,7 +56,7 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
       }
     }
 
-    const allDates = projects.flatMap(p => [p.createdAt, p.dueDate, ...p.tasks.map(t => t.dueDate).filter(Boolean) as Date[]])
+    const allDates = projects.flatMap(p => [p.startDate, p.dueDate, ...p.tasks.map(t => t.dueDate).filter(Boolean) as Date[]])
     const minDate = new Date(Math.min(...allDates.map(d => d.getTime())))
     const maxDate = new Date(Math.max(...allDates.map(d => d.getTime())))
     
@@ -129,8 +129,8 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                     {/* Projects and Tasks */}
                     <div className="relative">
                     {projectLayouts.map((project) => {
-                        const projectLeft = differenceInCalendarDays(project.createdAt, startDate) * dayWidth
-                        const projectWidth = (differenceInCalendarDays(project.dueDate, project.createdAt) + 1) * dayWidth
+                        const projectLeft = differenceInCalendarDays(project.startDate, startDate) * dayWidth
+                        const projectWidth = (differenceInCalendarDays(project.dueDate, project.startDate) + 1) * dayWidth
                         
                         return (
                         <div key={project.id} style={{ top: `${project.top}px`}} className="absolute w-full">
@@ -152,7 +152,7 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                                 </TooltipTrigger>
                                 <TooltipContent>
                                     <p className="font-bold">{project.name}</p>
-                                    <p>Start: {format(project.createdAt, "MMM d, yyyy")}</p>
+                                    <p>Start: {format(project.startDate, "MMM d, yyyy")}</p>
                                     <p>Due: {format(project.dueDate, "MMM d, yyyy")}</p>
                                     <p>Priority: {project.priority}</p>
                                 </TooltipContent>
