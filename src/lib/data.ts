@@ -40,10 +40,10 @@ export const projects: Project[] = [
     notes: 'Initial notes for the e-commerce platform project.',
     mindMap: ecommerceMindMap,
     tasks: [
-      { id: 'task-1-1', title: 'Design product page', status: 'Done', assigned: [users[2]], dueDate: new Date('2024-07-20'), priority: 'High' },
-      { id: 'task-1-2', title: 'Develop authentication API', status: 'In Progress', assigned: [users[1]], dueDate: new Date('2024-07-25'), priority: 'High' },
-      { id: 'task-1-3', title: 'Implement checkout flow UI', status: 'In Progress', assigned: [users[0], users[2]], dueDate: new Date('2024-08-01'), priority: 'Medium' },
-      { id: 'task-1-4', title: 'Setup database schema', status: 'Done', assigned: [users[1]], priority: 'High' },
+      { id: 'task-1-1', title: 'Design product page', status: 'Done', assigned: [users[2]], startDate: new Date('2024-07-15'), dueDate: new Date('2024-07-20'), priority: 'High' },
+      { id: 'task-1-2', title: 'Develop authentication API', status: 'In Progress', assigned: [users[1]], startDate: new Date('2024-07-20'), dueDate: new Date('2024-07-28'), priority: 'High' },
+      { id: 'task-1-3', title: 'Implement checkout flow UI', status: 'In Progress', assigned: [users[0], users[2]], startDate: new Date('2024-07-25'), dueDate: new Date('2024-08-05'), priority: 'Medium' },
+      { id: 'task-1-4', title: 'Setup database schema', status: 'Done', assigned: [users[1]], startDate: new Date('2024-07-10'), dueDate: new Date('2024-07-18'), priority: 'High' },
       { id: 'task-1-5', title: 'Write e2e tests for checkout', status: 'To-Do', assigned: [], priority: 'Medium' },
     ],
   },
@@ -58,9 +58,9 @@ export const projects: Project[] = [
     notes: 'Focus on security and performance.',
     mindMap: '',
     tasks: [
-      { id: 'task-2-1', title: 'User research and wireframing', status: 'Done', assigned: [users[2]], priority: 'Urgent' },
-      { id: 'task-2-2', title: 'Create component library', status: 'In Progress', assigned: [users[0]], dueDate: new Date('2024-07-22'), priority: 'High' },
-      { id: 'task-2-3', title: 'Implement fund transfer feature', status: 'To-Do', assigned: [], dueDate: new Date('2024-08-10'), priority: 'Urgent' },
+      { id: 'task-2-1', title: 'User research and wireframing', status: 'Done', assigned: [users[2]], startDate: new Date('2024-07-01'), dueDate: new Date('2024-07-15'), priority: 'Urgent' },
+      { id: 'task-2-2', title: 'Create component library', status: 'In Progress', assigned: [users[0]], startDate: new Date('2024-07-16'), dueDate: new Date('2024-07-28'), priority: 'High' },
+      { id: 'task-2-3', title: 'Implement fund transfer feature', status: 'To-Do', assigned: [], startDate: new Date('2024-08-01'), dueDate: new Date('2024-08-15'), priority: 'Urgent' },
       { id: 'task-2-4', title: 'Performance testing on Android', status: 'Backlog', assigned: [], priority: 'Medium' },
     ],
   },
@@ -89,7 +89,7 @@ export const projects: Project[] = [
     members: [users[0], users[4]],
     mindMap: '',
     tasks: [
-        { id: 'task-4-1', title: 'Define requirements', status: 'In Progress', assigned: [users[3]], dueDate: new Date('2024-07-22'), priority: 'Low' }
+        { id: 'task-4-1', title: 'Define requirements', status: 'In Progress', assigned: [users[3]], startDate: new Date('2024-07-18'), dueDate: new Date('2024-07-25'), priority: 'Low' }
     ],
   },
 ];

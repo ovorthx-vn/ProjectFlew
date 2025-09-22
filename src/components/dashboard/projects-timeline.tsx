@@ -56,7 +56,11 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
       }
     }
 
-    const allDates = projects.flatMap(p => [p.startDate, p.dueDate, ...p.tasks.map(t => t.dueDate).filter(Boolean) as Date[]])
+    const allDates = projects.flatMap(p => [
+        p.startDate, p.dueDate, 
+        ...p.tasks.map(t => t.startDate).filter(Boolean) as Date[],
+        ...p.tasks.map(t => t.dueDate).filter(Boolean) as Date[]
+    ])
     const minDate = new Date(Math.min(...allDates.map(d => d.getTime())))
     const maxDate = new Date(Math.max(...allDates.map(d => d.getTime())))
     
@@ -69,10 +73,10 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
     let currentTop = 0;
     const projectLayouts = projects.map(project => {
         const top = currentTop;
-        const tasksWithDueDate = project.tasks.filter(t => t.dueDate);
-        const height = 40 + (tasksWithDueDate.length * 32);
+        const tasksWithDates = project.tasks.filter(t => t.startDate && t.dueDate);
+        const height = 40 + (tasksWithDates.length * 32);
         currentTop += height + 20; // 20 for margin
-        return { ...project, top, height, tasksWithDueDate };
+        return { ...project, top, height, tasksWithDates };
     });
 
     return { months, totalDays, startDate: start, endDate: end, projectLayouts }
@@ -159,8 +163,9 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                             </Tooltip>
 
                             {/* Tasks */}
-                            {project.tasksWithDueDate.map((task, taskIndex) => {
-                                const taskLeft = differenceInCalendarDays(task.dueDate!, startDate) * dayWidth;
+                            {project.tasksWithDates.map((task, taskIndex) => {
+                                const taskLeft = differenceInCalendarDays(task.startDate!, startDate) * dayWidth;
+                                const taskWidth = (differenceInCalendarDays(task.dueDate!, task.startDate!) + 1) * dayWidth
                                 const taskTop = 40 + taskIndex * 32;
 
                                 return (
@@ -172,14 +177,14 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                                                 left: `${projectLeft + 10}px`,
                                                 top: '28px',
                                                 width: '1px',
-                                                height: `${taskTop - 28}px`,
+                                                height: `${taskTop - 28 + 12}`,
                                             }}
                                         />
                                          <div 
                                             className="absolute bg-border" 
                                             style={{
                                                 left: `${projectLeft + 10}px`,
-                                                top: `${taskTop + 4}px`,
+                                                top: `${taskTop + 12}px`,
                                                 width: `${taskLeft - (projectLeft + 10)}px`,
                                                 height: '1px',
                                             }}
@@ -192,7 +197,7 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                                                     style={{
                                                         top: `${taskTop}px`,
                                                         left: `${taskLeft}px`,
-                                                        width: `100px`,
+                                                        width: `${Math.max(taskWidth, 2)}px`, // min width
                                                         backgroundColor: `hsl(var(--secondary))`
                                                     }}
                                                 >
@@ -202,6 +207,7 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 <p className="font-bold">{task.title}</p>
+                                                <p>Start: {format(task.startDate!, "MMM d, yyyy")}</p>
                                                 <p>Due: {format(task.dueDate!, "MMM d, yyyy")}</p>
                                                 <p>Status: {task.status}</p>
                                                 <p>Priority: {task.priority}</p>

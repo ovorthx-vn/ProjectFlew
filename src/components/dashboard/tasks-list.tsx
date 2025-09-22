@@ -71,18 +71,16 @@ export function TasksList({ tasks, projectUsers, onTasksUpdate }: TasksListProps
   }
   
   const handleUpdateTask = (taskId: string, newValues: Partial<Task>) => {
-    const updatedTasks = tasks.map(task => 
+    onTasksUpdate(tasks.map(task => 
       task.id === taskId ? { ...task, ...newValues } : task
-    );
-    onTasksUpdate(updatedTasks);
+    ));
   }
 
   const handleAssignTeam = (assignedUsers: User[]) => {
     if (!editingTask) return;
-    const updatedTasks = tasks.map(task =>
+    onTasksUpdate(tasks.map(task =>
         task.id === editingTask.id ? { ...task, assigned: assignedUsers } : task
-    );
-    onTasksUpdate(updatedTasks);
+    ));
   }
 
   return (
@@ -108,6 +106,7 @@ export function TasksList({ tasks, projectUsers, onTasksUpdate }: TasksListProps
                 <TableHead>Title</TableHead>
                 <TableHead className="w-[150px]">Status</TableHead>
                 <TableHead className="w-[150px]">Priority</TableHead>
+                <TableHead className="w-[150px]">Start Date</TableHead>
                 <TableHead className="w-[150px]">Due Date</TableHead>
                 <TableHead>Assigned</TableHead>
                 <TableHead className="w-[100px] text-right">Actions</TableHead>
@@ -158,6 +157,33 @@ export function TasksList({ tasks, projectUsers, onTasksUpdate }: TasksListProps
                             variant={"outline"}
                             className={cn(
                                 "w-full justify-start text-left font-normal h-8",
+                                !task.startDate && "text-muted-foreground"
+                            )}
+                            >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {task.startDate ? format(task.startDate, "PPP") : <span>Pick a date</span>}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                            <Calendar
+                            mode="single"
+                            selected={task.startDate}
+                            onSelect={(date) => handleUpdateTask(task.id, { startDate: date })}
+                            disabled={(date) =>
+                                (task.dueDate ? date > task.dueDate : false) || date < new Date("1900-01-01")
+                            }
+                            initialFocus
+                            />
+                        </PopoverContent>
+                    </Popover>
+                  </TableCell>
+                  <TableCell>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                            variant={"outline"}
+                            className={cn(
+                                "w-full justify-start text-left font-normal h-8",
                                 !task.dueDate && "text-muted-foreground"
                             )}
                             >
@@ -170,6 +196,9 @@ export function TasksList({ tasks, projectUsers, onTasksUpdate }: TasksListProps
                             mode="single"
                             selected={task.dueDate}
                             onSelect={(date) => handleUpdateTask(task.id, { dueDate: date })}
+                            disabled={(date) =>
+                                (task.startDate ? date < task.startDate : false) || date < new Date("1900-01-01")
+                            }
                             initialFocus
                             />
                         </PopoverContent>

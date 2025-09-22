@@ -14,6 +14,7 @@ export type Task = {
   status: 'To-Do' | 'In Progress' | 'Done' | 'Backlog';
   assigned: User[];
   notes?: string;
+  startDate?: Date;
   dueDate?: Date;
   priority: Priority;
 };
