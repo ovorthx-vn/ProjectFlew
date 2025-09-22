@@ -12,6 +12,7 @@ export type Task = {
   status: 'To-Do' | 'In Progress' | 'Done' | 'Backlog';
   assigned: User[];
   notes?: string;
+  dueDate?: Date;
 };
 
 export type Project = {

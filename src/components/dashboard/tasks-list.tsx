@@ -1,9 +1,11 @@
 "use client"
 import * as React from "react"
-import { Plus, UserPlus } from "lucide-react"
+import { Plus, UserPlus, Calendar as CalendarIcon } from "lucide-react"
 import Image from "next/image"
+import { format } from "date-fns"
 
 import type { Task, User } from "@/lib/types"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -30,6 +32,8 @@ import {
 import { AssignTeamDialog } from "./assign-team-dialog"
 import { NotesPopover } from "./notes-popover"
 import { useToast } from "@/hooks/use-toast"
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
+import { Calendar } from "../ui/calendar"
 
 interface TasksListProps {
   tasks: Task[]
@@ -64,9 +68,9 @@ export function TasksList({ tasks, projectUsers, onTasksUpdate }: TasksListProps
     setNewTaskTitle("")
   }
   
-  const handleUpdateTaskStatus = (taskId: string, status: Task['status']) => {
+  const handleUpdateTask = (taskId: string, newValues: Partial<Task>) => {
     const updatedTasks = tasks.map(task => 
-      task.id === taskId ? { ...task, status } : task
+      task.id === taskId ? { ...task, ...newValues } : task
     );
     onTasksUpdate(updatedTasks);
   }
@@ -75,13 +79,6 @@ export function TasksList({ tasks, projectUsers, onTasksUpdate }: TasksListProps
     if (!editingTask) return;
     const updatedTasks = tasks.map(task =>
         task.id === editingTask.id ? { ...task, assigned: assignedUsers } : task
-    );
-    onTasksUpdate(updatedTasks);
-  }
-
-  const handleSaveNote = (taskId: string, notes: string) => {
-     const updatedTasks = tasks.map(task => 
-      task.id === taskId ? { ...task, notes } : task
     );
     onTasksUpdate(updatedTasks);
   }
@@ -108,6 +105,7 @@ export function TasksList({ tasks, projectUsers, onTasksUpdate }: TasksListProps
               <TableRow>
                 <TableHead>Title</TableHead>
                 <TableHead className="w-[150px]">Status</TableHead>
+                <TableHead className="w-[150px]">Due Date</TableHead>
                 <TableHead>Assigned</TableHead>
                 <TableHead className="w-[100px] text-right">Actions</TableHead>
               </TableRow>
@@ -119,7 +117,7 @@ export function TasksList({ tasks, projectUsers, onTasksUpdate }: TasksListProps
                   <TableCell>
                     <Select
                       value={task.status}
-                      onValueChange={(value: Task['status']) => handleUpdateTaskStatus(task.id, value)}
+                      onValueChange={(value: Task['status']) => handleUpdateTask(task.id, { status: value })}
                     >
                       <SelectTrigger className="h-8">
                         <SelectValue placeholder="Set status" />
@@ -132,6 +130,30 @@ export function TasksList({ tasks, projectUsers, onTasksUpdate }: TasksListProps
                         ))}
                       </SelectContent>
                     </Select>
+                  </TableCell>
+                  <TableCell>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                            variant={"outline"}
+                            className={cn(
+                                "w-full justify-start text-left font-normal h-8",
+                                !task.dueDate && "text-muted-foreground"
+                            )}
+                            >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {task.dueDate ? format(task.dueDate, "PPP") : <span>Pick a date</span>}
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                            <Calendar
+                            mode="single"
+                            selected={task.dueDate}
+                            onSelect={(date) => handleUpdateTask(task.id, { dueDate: date })}
+                            initialFocus
+                            />
+                        </PopoverContent>
+                    </Popover>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
@@ -160,7 +182,7 @@ export function TasksList({ tasks, projectUsers, onTasksUpdate }: TasksListProps
                     <NotesPopover 
                         title={`Notes for ${task.title}`} 
                         notes={task.notes} 
-                        onSave={(newNotes) => handleSaveNote(task.id, newNotes)}
+                        onSave={(newNotes) => handleUpdateTask(task.id, { notes: newNotes })}
                     />
                   </TableCell>
                 </TableRow>

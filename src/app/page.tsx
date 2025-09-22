@@ -8,11 +8,13 @@ import {
   CalendarDays,
   LayoutGrid,
   Settings,
+  Users as UsersIcon,
   User as UserIcon,
 } from "lucide-react"
+import { format } from "date-fns"
 
-import { projects as initialProjects, users } from "@/lib/data"
-import type { Project } from "@/lib/types"
+import { projects as initialProjects, users as initialUsers } from "@/lib/data"
+import type { Project, User, Task } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -44,9 +46,12 @@ import {
 import { Icons } from "@/components/icons"
 import { ProjectsView } from "@/components/dashboard/projects-view"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 
 export default function DashboardPage() {
   const [projects, setProjects] = React.useState<Project[]>(initialProjects);
+  const [users, setUsers] = React.useState<User[]>(initialUsers);
   const [isCollapsed, setIsCollapsed] = React.useState(false)
 
   const addProject = (project: Omit<Project, 'id' | 'createdAt' | 'tasks' | 'progress'>) => {
@@ -63,6 +68,55 @@ export default function DashboardPage() {
   const updateProject = (updatedProject: Project) => {
     setProjects(prev => prev.map(p => p.id === updatedProject.id ? updatedProject : p));
   }
+  
+  const allTasks = projects.flatMap(p => p.tasks.map(t => ({...t, project: p.name, projectId: p.id, projectDueDate: p.dueDate})));
+  const tasksByDueDate = allTasks.reduce((acc, task) => {
+    if (task.dueDate) {
+      const dateStr = format(task.dueDate, 'yyyy-MM-dd');
+      if (!acc[dateStr]) {
+        acc[dateStr] = [];
+      }
+      acc[dateStr].push(task);
+    }
+    return acc;
+  }, {} as Record<string, (Task & { project: string, projectId: string, projectDueDate: Date })[]>);
+
+  const DayWithDot: React.FC<{day: Date}> = ({ day }) => {
+    const dateStr = format(day, 'yyyy-MM-dd');
+    const tasks = tasksByDueDate[dateStr];
+    
+    if (tasks && tasks.length > 0) {
+      return (
+        <Popover>
+          <PopoverTrigger asChild>
+            <div className="relative">
+              {format(day, 'd')}
+              <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
+            </div>
+          </PopoverTrigger>
+          <PopoverContent className="w-80">
+            <div className="grid gap-4">
+              <h4 className="font-medium">Tasks due on {format(day, "PPP")}</h4>
+              <div className="space-y-2">
+                {tasks.map(task => (
+                   <Card key={task.id}>
+                    <CardHeader className="p-4">
+                      <CardTitle className="text-sm">{task.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-4 pt-0 text-xs text-muted-foreground">
+                      <p>Project: {task.project}</p>
+                      <p>Status: <Badge variant="secondary">{task.status}</Badge></p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+      );
+    }
+    return <>{format(day, 'd')}</>;
+  };
 
   return (
     <SidebarProvider defaultOpen onOpenChange={(open) => setIsCollapsed(!open)}>
@@ -80,9 +134,15 @@ export default function DashboardPage() {
         <SidebarContent>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton href="#" isActive>
+              <SidebarMenuButton href="/" isActive>
                 <LayoutGrid />
                 Projects
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+             <SidebarMenuItem>
+              <SidebarMenuButton href="/team">
+                <UsersIcon />
+                Team
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
@@ -92,7 +152,7 @@ export default function DashboardPage() {
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton href="#">
+              <SidebarMenuButton href="/settings">
                 <Settings />
                 Settings
               </SidebarMenuButton>
@@ -153,8 +213,11 @@ export default function DashboardPage() {
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="end">
                 <Calendar
-                  mode="multiple"
-                  selected={projects.map(p => p.dueDate)}
+                  mode="single"
+                  selected={new Date()}
+                  components={{
+                    Day: ({ date }) => <DayWithDot day={date} />,
+                  }}
                   classNames={{
                     day_selected: "bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary/90",
                   }}

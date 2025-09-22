@@ -19,9 +19,9 @@ export const projects: Project[] = [
     mindMapUrl: 'https://picsum.photos/seed/mindmap1/800/600',
     createdAt: new Date('2024-03-01'),
     tasks: [
-      { id: 'task-1-1', title: 'Design product page', status: 'Done', assigned: [users[2]] },
-      { id: 'task-1-2', title: 'Develop authentication API', status: 'In Progress', assigned: [users[1]] },
-      { id: 'task-1-3', title: 'Implement checkout flow UI', status: 'In Progress', assigned: [users[0], users[2]] },
+      { id: 'task-1-1', title: 'Design product page', status: 'Done', assigned: [users[2]], dueDate: new Date('2024-07-20') },
+      { id: 'task-1-2', title: 'Develop authentication API', status: 'In Progress', assigned: [users[1]], dueDate: new Date('2024-07-25') },
+      { id: 'task-1-3', title: 'Implement checkout flow UI', status: 'In Progress', assigned: [users[0], users[2]], dueDate: new Date('2024-08-01') },
       { id: 'task-1-4', title: 'Setup database schema', status: 'Done', assigned: [users[1]] },
       { id: 'task-1-5', title: 'Write e2e tests for checkout', status: 'To-Do', assigned: [] },
     ],
@@ -36,8 +36,8 @@ export const projects: Project[] = [
     notes: 'Focus on security and performance.',
     tasks: [
       { id: 'task-2-1', title: 'User research and wireframing', status: 'Done', assigned: [users[2]] },
-      { id: 'task-2-2', title: 'Create component library', status: 'In Progress', assigned: [users[0]] },
-      { id: 'task-2-3', title: 'Implement fund transfer feature', status: 'To-Do', assigned: [] },
+      { id: 'task-2-2', title: 'Create component library', status: 'In Progress', assigned: [users[0]], dueDate: new Date('2024-07-22') },
+      { id: 'task-2-3', title: 'Implement fund transfer feature', status: 'To-Do', assigned: [], dueDate: new Date('2024-08-10') },
       { id: 'task-2-4', title: 'Performance testing on Android', status: 'Backlog', assigned: [] },
     ],
   },
@@ -63,7 +63,7 @@ export const projects: Project[] = [
     members: [users[0], users[4]],
     createdAt: new Date('2024-08-01'),
     tasks: [
-        { id: 'task-4-1', title: 'Define requirements', status: 'In Progress', assigned: [users[3]] }
+        { id: 'task-4-1', title: 'Define requirements', status: 'In Progress', assigned: [users[3]], dueDate: new Date('2024-07-22') }
     ],
   },
 ];
