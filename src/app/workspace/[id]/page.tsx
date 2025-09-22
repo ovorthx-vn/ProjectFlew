@@ -14,7 +14,9 @@ import {
   Youtube,
   StickyNote,
   PlusCircle,
-  Link as LinkIcon
+  Link as LinkIcon,
+  MoreHorizontal,
+  Pencil
 } from "lucide-react"
 import Link from "next/link"
 import { format } from "date-fns"
@@ -52,6 +54,9 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { SaveNoteDialog } from "@/components/workspace/save-note-dialog"
 import { YouTubeLinkDialog } from "@/components/workspace/youtube-link-dialog"
 import { AddDocumentLinkDialog } from "@/components/workspace/add-document-link-dialog"
+import { ConfirmationDialog } from "@/components/workspace/confirmation-dialog"
+import { EditNoteDialog } from "@/components/workspace/edit-note-dialog"
+import { EditLinkDialog } from "@/components/workspace/edit-link-dialog"
 
 function WorkspaceDetail({ id }: { id: string }) {
   const [isCollapsed, setIsCollapsed] = React.useState(false)
@@ -64,6 +69,11 @@ function WorkspaceDetail({ id }: { id: string }) {
   const [isSaveNoteDialogOpen, setIsSaveNoteDialogOpen] = React.useState(false);
   const [isYouTubeLinkDialogOpen, setIsYouTubeLinkDialogOpen] = React.useState(false);
   const [isAddDocumentLinkDialogOpen, setIsAddDocumentLinkDialogOpen] = React.useState(false);
+
+  // State for edit/delete dialogs
+  const [editingNote, setEditingNote] = React.useState<QuickNote | null>(null);
+  const [editingLink, setEditingLink] = React.useState<DocumentLink | null>(null);
+  const [itemToDelete, setItemToDelete] = React.useState<{type: 'note' | 'link', id: string} | null>(null);
 
 
   React.useEffect(() => {
@@ -118,6 +128,37 @@ function WorkspaceDetail({ id }: { id: string }) {
         }
         updateWorkspace(updatedWorkspace);
     }
+  }
+
+  const handleDelete = () => {
+    if (!workspace || !itemToDelete) return;
+    
+    let updatedWorkspace;
+    if (itemToDelete.type === 'note') {
+      updatedWorkspace = {
+        ...workspace,
+        quickNotes: workspace.quickNotes.filter(n => n.id !== itemToDelete.id)
+      };
+    } else {
+      updatedWorkspace = {
+        ...workspace,
+        documentLinks: (workspace.documentLinks || []).filter(l => l.id !== itemToDelete.id)
+      };
+    }
+    updateWorkspace(updatedWorkspace);
+    setItemToDelete(null);
+  }
+
+  const handleUpdateNote = (updatedNote: QuickNote) => {
+    if (!workspace) return;
+    const updatedNotes = workspace.quickNotes.map(n => n.id === updatedNote.id ? updatedNote : n);
+    updateWorkspace({ ...workspace, quickNotes: updatedNotes });
+  }
+
+  const handleUpdateLink = (updatedLink: DocumentLink) => {
+    if (!workspace) return;
+    const updatedLinks = (workspace.documentLinks || []).map(l => l.id === updatedLink.id ? updatedLink : l);
+    updateWorkspace({ ...workspace, documentLinks: updatedLinks });
   }
 
 
@@ -267,8 +308,8 @@ function WorkspaceDetail({ id }: { id: string }) {
                                 <CardTitle className="flex items-center gap-2"><Youtube /> YouTube</CardTitle>
                                 <CardDescription>Your study video/playlist.</CardDescription>
                             </div>
-                            <Button variant="ghost" size="icon" onClick={() => setIsYouTubeLinkDialogOpen(true)}>
-                                <PlusCircle className="h-4 w-4" />
+                             <Button variant="ghost" size="icon" onClick={() => setIsYouTubeLinkDialogOpen(true)}>
+                                <Pencil className="h-4 w-4" />
                             </Button>
                         </CardHeader>
                         <CardContent>
@@ -290,10 +331,21 @@ function WorkspaceDetail({ id }: { id: string }) {
                         <CardContent>
                             <ul className="space-y-2">
                             {workspace.quickNotes.map(note => (
-                                <li key={note.id}>
+                                <li key={note.id} className="flex items-center gap-2">
                                 <Button variant="outline" className="w-full justify-start" onClick={() => setSelectedNote(note)}>
                                     {note.title}
                                 </Button>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent>
+                                    <DropdownMenuItem onClick={() => setEditingNote(note)}>Edit</DropdownMenuItem>
+                                    <DropdownMenuItem className="text-destructive" onClick={() => setItemToDelete({type: 'note', id: note.id})}>Delete</DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
                                 </li>
                             ))}
                             </ul>
@@ -306,18 +358,30 @@ function WorkspaceDetail({ id }: { id: string }) {
                                 <CardDescription>Relevant links and documents.</CardDescription>
                             </div>
                             <Button variant="outline" size="sm" onClick={() => setIsAddDocumentLinkDialogOpen(true)}>
+                                <PlusCircle className="mr-2 h-4 w-4" />
                                 Add
                             </Button>
                         </CardHeader>
                         <CardContent>
                             <ul className="space-y-2">
                             {(workspace.documentLinks || []).map(link => (
-                                <li key={link.id}>
+                                <li key={link.id} className="flex items-center gap-2">
                                 <Button variant="outline" className="w-full justify-start" asChild>
-                                    <Link href={link.url} target="_blank">
+                                    <Link href={link.url} target="_blank" className="truncate">
                                         {link.title}
                                     </Link>
                                 </Button>
+                                 <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent>
+                                    <DropdownMenuItem onClick={() => setEditingLink(link)}>Edit</DropdownMenuItem>
+                                    <DropdownMenuItem className="text-destructive" onClick={() => setItemToDelete({type: 'link', id: link.id})}>Delete</DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
                                 </li>
                             ))}
                             </ul>
@@ -374,21 +438,33 @@ function WorkspaceDetail({ id }: { id: string }) {
         onClose={() => setIsAddDocumentLinkDialogOpen(false)}
         onSave={handleAddDocumentLink}
       />
+      <ConfirmationDialog
+        isOpen={!!itemToDelete}
+        onClose={() => setItemToDelete(null)}
+        onConfirm={handleDelete}
+        title="Are you sure?"
+        description="This action cannot be undone. This will permanently delete the item."
+      />
+      {editingNote && (
+        <EditNoteDialog
+          isOpen={!!editingNote}
+          onClose={() => setEditingNote(null)}
+          note={editingNote}
+          onSave={handleUpdateNote}
+        />
+      )}
+      {editingLink && (
+        <EditLinkDialog
+          isOpen={!!editingLink}
+          onClose={() => setEditingLink(null)}
+          link={editingLink}
+          onSave={handleUpdateLink}
+        />
+      )}
     </SidebarProvider>
   )
 }
 
 export default function WorkspaceDetailPage({ params }: { params: { id: string } }) {
-  const id = params.id;
-
-  if (!id) {
-    // You can render a loading state here
-    return (
-        <div className="flex items-center justify-center h-screen">
-            <p>Loading workspace...</p>
-        </div>
-    );
-  }
-
-  return <WorkspaceDetail id={id} />
+    return <WorkspaceDetail id={params.id} />
 }

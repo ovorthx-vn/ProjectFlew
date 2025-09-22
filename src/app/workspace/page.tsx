@@ -144,7 +144,7 @@ export default function WorkspaceListPage() {
         <main className="flex-1 p-4 sm:p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {workspaces.map(ws => (
-              <Link key={ws.id} href={`/workspace/${ws.id}`} className="block hover:shadow-lg transition-shadow rounded-lg">
+              <Link key={ws.id} href={`/workspace/${ws.id}`} className="block rounded-lg hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-ring">
                 <Card className="h-full flex flex-col">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
