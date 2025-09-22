@@ -187,20 +187,20 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
           A Gantt-style overview of your projects and their tasks.
         </CardDescription>
       </CardHeader>
-      <CardContent className="p-6 pt-2 overflow-x-auto">
-        <div ref={containerRef} className="w-full min-w-[1200px]">
+      <CardContent className="p-6 pt-2">
+        <div ref={containerRef} className="w-full">
             {containerWidth > 0 && (
                 <TooltipProvider>
                 <div className="relative" style={{ height: `${totalHeight}px` }}>
                     {/* Months Header & Grid Lines */}
-                    <div className="sticky top-0 z-10 flex bg-background/80 backdrop-blur-sm h-10 items-end">
-                        {months.map((month) => {
+                    <div className="sticky top-0 z-10 flex bg-background/80 backdrop-blur-sm h-10 items-end border-b">
+                        {months.map((month, index) => {
                             const daysInMonth = differenceInCalendarDays(endOfMonth(month), startOfMonth(month)) + 1;
                             const displayYear = getYear(month) !== getYear(addMonths(month, -1));
                             return (
                                 <div 
                                     key={month.toString()} 
-                                    className="text-center text-xs font-semibold border-r"
+                                    className={cn("text-center text-xs font-semibold", index < months.length -1 && "border-r")}
                                     style={{ width: `${daysInMonth * dayWidth}px` }}
                                 >
                                 {displayYear ? format(month, 'MMM yyyy') : format(month, 'MMM')}
@@ -213,7 +213,7 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                        {Array.from({ length: totalDays }).map((_, i) => (
                           <div
                             key={i}
-                            className="absolute top-0 h-full border-r border-border/50"
+                            className="absolute top-0 h-full border-r border-border/30"
                             style={{ left: `${(i + 1) * dayWidth}px` }}
                           />
                         ))}
@@ -230,7 +230,7 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                     </div>
 
                     {/* Projects and Tasks */}
-                    <div className="relative">
+                    <div className="relative pt-4">
                     {projectLayouts.map((project) => {
                         const projectLeft = getPosition(project.startDate);
                         const projectWidth = getWidth(project.startDate, project.dueDate);
@@ -271,21 +271,21 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                                   if (!depLayout) return null;
                                   
                                   const fromX = getPosition(depLayout.dueDate) + getWidth(depLayout.startDate, depLayout.dueDate);
-                                  const fromY = project.top + 40 + depLayout.top + 14;
+                                  const fromY = 40 + depLayout.top + 14;
                                   const toX = getPosition(taskLayout.startDate);
-                                  const toY = project.top + 40 + taskLayout.top + 14;
+                                  const toY = 40 + taskLayout.top + 14;
                                   const midX = fromX + 15;
 
                                   return (
                                     <svg key={`${task.id}-${depId}`} className="absolute" style={{ top: 0, left: 0, width: '100%', height: project.height, pointerEvents: 'none' }}>
                                       <path 
                                         d={`M ${fromX} ${fromY} L ${midX} ${fromY} L ${midX} ${toY} L ${toX} ${toY}`} 
-                                        stroke="hsl(var(--border))" 
+                                        stroke="hsl(var(--muted-foreground) / 0.8)" 
                                         strokeWidth="1.5" 
                                         fill="none" 
                                       />
                                       {/* Arrowhead */}
-                                      <path d={`M ${toX - 5} ${toY - 4} L ${toX} ${toY} L ${toX - 5} ${toY + 4}`} stroke="hsl(var(--border))" strokeWidth="1.5" fill="none" />
+                                      <path d={`M ${toX - 5} ${toY - 4} L ${toX} ${toY} L ${toX - 5} ${toY + 4}`} stroke="hsl(var(--muted-foreground) / 0.8)" strokeWidth="1.5" fill="none" />
                                     </svg>
                                   );
                                 });
@@ -310,17 +310,9 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                                                 }}
                                             >
                                                 <div className={cn("absolute left-0 top-0 h-full w-1 rounded-l-md", taskPriorityColorClass[task.priority])} />
-                                                <span className="text-xs text-secondary-foreground font-medium truncate absolute left-full ml-9 w-40">
+                                                <span className="text-xs text-secondary-foreground font-medium truncate ml-2">
                                                   {task.title}
                                                 </span>
-                                                <div className="absolute left-full ml-2 flex items-center">
-                                                  {task.assigned.map(user => (
-                                                    <Avatar key={user.id} className="h-5 w-5 -ml-1 border-2 border-background">
-                                                      <AvatarImage src={user.avatar} alt={user.name}/>
-                                                      <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                                                    </Avatar>
-                                                  ))}
-                                                </div>
                                             </div>
                                         </TooltipTrigger>
                                         <TooltipContent>
@@ -351,3 +343,5 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
     </Card>
   )
 }
+
+    

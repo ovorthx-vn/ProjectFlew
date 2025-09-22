@@ -46,10 +46,12 @@ export function ProjectsView({ projects, users, onAddProject, onUpdateProject }:
         <TabsContent value="table">
           <ProjectsTable projects={projects} users={users} onUpdateProject={onUpdateProject} />
         </TabsContent>
-        <TabsContent value="timeline">
+        <TabsContent value="timeline" className="overflow-x-auto">
           <ProjectsTimeline projects={projects} />
         </TabsContent>
       </Tabs>
     </div>
   )
 }
+
+    
