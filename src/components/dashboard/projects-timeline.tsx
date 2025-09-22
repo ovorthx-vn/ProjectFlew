@@ -123,17 +123,7 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                             );
                         })}
                     </div>
-                    {/* Day grid lines */}
-                    <div className="absolute top-10 left-0 w-full h-full">
-                        {months.flatMap(month => {
-                            const daysInMonth = differenceInCalendarDays(endOfMonth(month), startOfMonth(month)) + 1;
-                            const monthWidth = daysInMonth * dayWidth;
-                            return (
-                                <div key={month.toISOString()} className="absolute top-0 h-full border-r" style={{ left: getPosition(month), width: `${monthWidth}px` }}/>
-                            )
-                        })}
-                    </div>
-
+                    
                     {/* Today marker */}
                     <div className="absolute top-0 h-full" style={{ left: `${getPosition(new Date())}px`}}>
                         <div className="w-px h-full bg-primary" />
@@ -145,7 +135,7 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                     </div>
 
                     {/* Projects */}
-                    <div className="relative pt-4">
+                    <div className="relative pt-8">
                     {projects.map((project, index) => {
                         const projectLeft = getPosition(project.startDate);
                         const projectWidth = getWidth(project.startDate, project.dueDate);
