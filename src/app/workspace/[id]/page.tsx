@@ -54,12 +54,21 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { SaveNoteDialog } from "@/components/workspace/save-note-dialog"
 import { YouTubeLinkDialog } from "@/components/workspace/youtube-link-dialog"
 import { AddDocumentLinkDialog } from "@/components/workspace/add-document-link-dialog"
+import { DeleteConfirmationDialog } from "@/components/workspace/delete-confirmation-dialog"
+import { EditNoteDialog } from "@/components/workspace/edit-note-dialog"
+import { EditLinkDialog } from "@/components/workspace/edit-link-dialog"
 
 function WorkspaceDetail({ id }: { id: string }) {
   const [isCollapsed, setIsCollapsed] = React.useState(false)
   const { workspaces, updateWorkspace } = useWorkspace();
   const [workspace, setWorkspace] = React.useState<Workspace | null>(null);
+  
+  // Dialog states
   const [selectedNote, setSelectedNote] = React.useState<QuickNote | null>(null)
+  const [editingNote, setEditingNote] = React.useState<QuickNote | null>(null)
+  const [editingLink, setEditingLink] = React.useState<DocumentLink | null>(null)
+  const [itemToDelete, setItemToDelete] = React.useState<{type: 'note' | 'link', id: string} | null>(null);
+  
   const [mainNote, setMainNote] = React.useState('');
   const [isSaveNoteDialogOpen, setIsSaveNoteDialogOpen] = React.useState(false);
   const [isYouTubeLinkDialogOpen, setIsYouTubeLinkDialogOpen] = React.useState(false);
@@ -99,6 +108,13 @@ function WorkspaceDetail({ id }: { id: string }) {
     }
   }
 
+  const handleUpdateQuickNote = (updatedNote: QuickNote) => {
+    if(workspace) {
+        const updatedNotes = workspace.quickNotes.map(note => note.id === updatedNote.id ? updatedNote : note);
+        updateWorkspace({ ...workspace, quickNotes: updatedNotes });
+    }
+  }
+
   const handleSaveYouTubeLink = (link: string) => {
     if (workspace) {
       updateWorkspace({ ...workspace, youtubeUrl: link });
@@ -119,6 +135,36 @@ function WorkspaceDetail({ id }: { id: string }) {
         updateWorkspace(updatedWorkspace);
     }
   }
+
+  const handleUpdateLink = (updatedLink: DocumentLink) => {
+     if(workspace) {
+        const updatedLinks = (workspace.documentLinks || []).map(link => link.id === updatedLink.id ? updatedLink : link);
+        updateWorkspace({ ...workspace, documentLinks: updatedLinks });
+    }
+  }
+  
+  const handleDelete = () => {
+    if (!itemToDelete || !workspace) return;
+    
+    let updatedWorkspace: Workspace | null = null;
+    if (itemToDelete.type === 'note') {
+      updatedWorkspace = {
+        ...workspace,
+        quickNotes: workspace.quickNotes.filter(note => note.id !== itemToDelete.id)
+      };
+    } else if (itemToDelete.type === 'link') {
+       updatedWorkspace = {
+        ...workspace,
+        documentLinks: (workspace.documentLinks || []).filter(link => link.id !== itemToDelete.id)
+      };
+    }
+
+    if(updatedWorkspace) {
+      updateWorkspace(updatedWorkspace);
+    }
+    setItemToDelete(null);
+  }
+
 
  const getYouTubeEmbedUrl = (url: string | undefined): string => {
     if (!url) {
@@ -300,8 +346,8 @@ function WorkspaceDetail({ id }: { id: string }) {
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent>
-                                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                                        <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => setEditingNote(note)}>Edit</DropdownMenuItem>
+                                        <DropdownMenuItem className="text-destructive" onClick={() => setItemToDelete({type: 'note', id: note.id})}>Delete</DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                                 </li>
@@ -335,8 +381,8 @@ function WorkspaceDetail({ id }: { id: string }) {
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent>
-                                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                                        <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => setEditingLink(link)}>Edit</DropdownMenuItem>
+                                        <DropdownMenuItem className="text-destructive" onClick={() => setItemToDelete({type: 'link', id: link.id})}>Delete</DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                                 </li>
@@ -395,18 +441,34 @@ function WorkspaceDetail({ id }: { id: string }) {
         onClose={() => setIsAddDocumentLinkDialogOpen(false)}
         onSave={handleAddDocumentLink}
       />
+      <DeleteConfirmationDialog
+        isOpen={!!itemToDelete}
+        onClose={() => setItemToDelete(null)}
+        onConfirm={handleDelete}
+        itemType={itemToDelete?.type}
+      />
+       {editingNote && (
+        <EditNoteDialog
+          isOpen={!!editingNote}
+          onClose={() => setEditingNote(null)}
+          onSave={handleUpdateQuickNote}
+          note={editingNote}
+        />
+      )}
+      {editingLink && (
+        <EditLinkDialog
+          isOpen={!!editingLink}
+          onClose={() => setEditingLink(null)}
+          onSave={handleUpdateLink}
+          link={editingLink}
+        />
+      )}
     </SidebarProvider>
   )
 }
 
 export default function WorkspaceDetailPage({ params }: { params: { id: string } }) {
-  const [id, setId] = React.useState<string>('');
-  
-  React.useEffect(() => {
-    if (params) {
-        setId(params.id);
-    }
-  }, [params]);
+    const id = params.id;
 
   if (!id) {
     // You can render a loading state here
