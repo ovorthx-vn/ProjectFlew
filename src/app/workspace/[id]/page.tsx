@@ -466,5 +466,13 @@ function WorkspaceDetail({ id }: { id: string }) {
 }
 
 export default function WorkspaceDetailPage({ params }: { params: { id: string } }) {
-    return <WorkspaceDetail id={params.id} />
+  // We are on the client, so we can use params.id directly
+  if (!params.id) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p>Loading workspace...</p>
+      </div>
+    );
+  }
+  return <WorkspaceDetail id={params.id} />;
 }
