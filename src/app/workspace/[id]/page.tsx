@@ -12,7 +12,9 @@ import {
   Calendar,
   User,
   Music,
-  StickyNote
+  StickyNote,
+  MoreHorizontal,
+  PlusCircle
 } from "lucide-react"
 import { format } from "date-fns"
 
@@ -40,11 +42,13 @@ import {
 } from "@/components/ui/sidebar"
 import { Icons } from "@/components/icons"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import type { Workspace, QuickNote } from "@/lib/types"
 import { NoteDialog } from "@/components/workspace/note-dialog"
 import { useWorkspace } from "@/context/workspace-context"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { SaveNoteDialog } from "@/components/workspace/save-note-dialog"
 
 export default function WorkspaceDetailPage({ params }: { params: { id: string } }) {
   const [isCollapsed, setIsCollapsed] = React.useState(false)
@@ -52,6 +56,7 @@ export default function WorkspaceDetailPage({ params }: { params: { id: string }
   const [workspace, setWorkspace] = React.useState<Workspace | null>(null);
   const [selectedNote, setSelectedNote] = React.useState<QuickNote | null>(null)
   const [mainNote, setMainNote] = React.useState('');
+  const [isSaveNoteDialogOpen, setIsSaveNoteDialogOpen] = React.useState(false);
 
 
   React.useEffect(() => {
@@ -66,9 +71,24 @@ export default function WorkspaceDetailPage({ params }: { params: { id: string }
     setMainNote(e.target.value);
   }
 
-  const handleSaveNote = () => {
-    if (workspace) {
+  const handleBlurNote = () => {
+    if (workspace && mainNote !== workspace.mainNote) {
       updateWorkspace({ ...workspace, mainNote });
+    }
+  }
+  
+  const handleSaveAsQuickNote = (title: string) => {
+    if(workspace) {
+        const newQuickNote: QuickNote = {
+            id: `qn-${Date.now()}`,
+            title,
+            content: mainNote
+        }
+        const updatedWorkspace = {
+            ...workspace,
+            quickNotes: [...workspace.quickNotes, newQuickNote]
+        }
+        updateWorkspace(updatedWorkspace);
     }
   }
 
@@ -178,42 +198,55 @@ export default function WorkspaceDetailPage({ params }: { params: { id: string }
             <ThemeToggle />
           </div>
         </header>
-        <main className="flex-1 p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-1 space-y-6">
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2"><Music /> Spotify</CardTitle>
-                        <CardDescription>Your study playlist.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="aspect-video bg-muted rounded-md flex items-center justify-center">
-                            <p className="text-muted-foreground text-sm">Spotify player placeholder</p>
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2"><StickyNote /> Quick Notes</CardTitle>
-                        <CardDescription>Click to view a note.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <ul className="space-y-2">
-                          {workspace.quickNotes.map(note => (
-                            <li key={note.id}>
-                              <Button variant="outline" className="w-full justify-start" onClick={() => setSelectedNote(note)}>
-                                {note.title}
-                              </Button>
-                            </li>
-                          ))}
-                        </ul>
-                    </CardContent>
-                </Card>
-            </div>
+        <main className="flex-1 p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-60px)]">
+            <ScrollArea className="h-full">
+                <div className="lg:col-span-1 space-y-6 pr-4">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2"><Music /> Spotify</CardTitle>
+                            <CardDescription>Your study playlist.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="aspect-video bg-muted rounded-md flex items-center justify-center">
+                                <p className="text-muted-foreground text-sm">Spotify player placeholder</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2"><StickyNote /> Quick Notes</CardTitle>
+                            <CardDescription>Click to view a note.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <ul className="space-y-2">
+                            {workspace.quickNotes.map(note => (
+                                <li key={note.id} className="flex items-center gap-2">
+                                <Button variant="outline" className="w-full justify-start" onClick={() => setSelectedNote(note)}>
+                                    {note.title}
+                                </Button>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
+                                            <MoreHorizontal className="h-4 w-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                        <DropdownMenuItem>Edit</DropdownMenuItem>
+                                        <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                                </li>
+                            ))}
+                            </ul>
+                        </CardContent>
+                    </Card>
+                </div>
+            </ScrollArea>
             <div className="lg:col-span-2">
                 <Card className="h-full flex flex-col">
                     <CardHeader>
                         <CardTitle>Notes</CardTitle>
-                        <CardDescription>Your main area for taking notes for {workspace.subject}.</CardDescription>
+                        <CardDescription>Your main area for taking notes for {workspace.subject}. Changes are saved automatically.</CardDescription>
                     </CardHeader>
                     <CardContent className="flex-grow flex flex-col">
                         <Textarea 
@@ -221,9 +254,15 @@ export default function WorkspaceDetailPage({ params }: { params: { id: string }
                             placeholder="Start typing your notes here..." 
                             value={mainNote}
                             onChange={handleNoteChange}
-                            onBlur={handleSaveNote}
+                            onBlur={handleBlurNote}
                         />
                     </CardContent>
+                    <CardFooter>
+                        <Button className="ml-auto" onClick={() => setIsSaveNoteDialogOpen(true)}>
+                            <PlusCircle className="mr-2" />
+                           Save as Quick Note
+                        </Button>
+                    </CardFooter>
                 </Card>
             </div>
         </main>
@@ -236,6 +275,11 @@ export default function WorkspaceDetailPage({ params }: { params: { id: string }
           note={selectedNote}
         />
       )}
+      <SaveNoteDialog
+          isOpen={isSaveNoteDialogOpen}
+          onClose={() => setIsSaveNoteDialogOpen(false)}
+          onSave={handleSaveAsQuickNote}
+      />
     </SidebarProvider>
   )
 }
