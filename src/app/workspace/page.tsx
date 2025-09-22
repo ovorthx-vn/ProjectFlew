@@ -42,6 +42,8 @@ import { Badge } from "@/components/ui/badge"
 import { CreateWorkspaceDialog } from "@/components/workspace/create-workspace-dialog"
 import type { Workspace } from "@/lib/types"
 import { useWorkspace } from "@/context/workspace-context"
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
+
 
 export default function WorkspaceListPage() {
   const [isCollapsed, setIsCollapsed] = React.useState(false)
@@ -142,24 +144,22 @@ export default function WorkspaceListPage() {
         <main className="flex-1 p-4 sm:p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {workspaces.map(ws => (
-               <Link 
-                key={ws.id} 
-                href={`/workspace/${ws.id}`} 
-                className="rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-lg transition-shadow flex flex-col"
-              >
-                <div className="flex flex-col space-y-1.5 p-6">
-                  <h3 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
-                    <BookOpen className="text-primary" />
-                    {ws.subject}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">Tutor: {ws.tutor}</p>
-                </div>
-                <div className="p-6 pt-0 flex-grow flex items-end">
-                  <div className="flex justify-between items-center text-sm text-muted-foreground w-full">
-                    <span>Due Date</span>
-                    <Badge variant="outline">{format(ws.dueDate, "PPP")}</Badge>
-                  </div>
-                </div>
+              <Link key={ws.id} href={`/workspace/${ws.id}`} className="block hover:shadow-lg transition-shadow rounded-lg">
+                <Card className="h-full flex flex-col">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BookOpen className="text-primary" />
+                      {ws.subject}
+                    </CardTitle>
+                    <CardDescription>Tutor: {ws.tutor}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex-grow flex items-end">
+                    <div className="flex justify-between items-center text-sm text-muted-foreground w-full">
+                      <span>Due Date</span>
+                      <Badge variant="outline">{format(ws.dueDate, "PPP")}</Badge>
+                    </div>
+                  </CardContent>
+                </Card>
               </Link>
             ))}
           </div>
