@@ -30,4 +30,5 @@ export type Project = {
   members: User[];
   notes?: string;
   mindMap?: string;
+  completionNote?: string;
 };

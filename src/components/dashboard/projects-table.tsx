@@ -27,6 +27,7 @@ import { MindMapDialog } from "./mind-map-dialog"
 import { NotesPopover } from "./notes-popover"
 import { TasksList } from "./tasks-list"
 import { Badge } from "../ui/badge"
+import { CompletionNoteDialog } from "./completion-note-dialog"
 
 interface ProjectsTableProps {
   projects: Project[]
@@ -44,6 +45,7 @@ const priorityBadgeVariant: Record<Priority, string> = {
 export function ProjectsTable({ projects, users, onUpdateProject }: ProjectsTableProps) {
   const [expandedRows, setExpandedRows] = React.useState<Set<string>>(new Set())
   const [activeMindMap, setActiveMindMap] = React.useState<Project | null>(null)
+  const [projectToComplete, setProjectToComplete] = React.useState<Project | null>(null);
 
   const toggleRow = (id: string) => {
     const newSet = new Set(expandedRows)
@@ -62,10 +64,24 @@ export function ProjectsTable({ projects, users, onUpdateProject }: ProjectsTabl
   const handleTaskUpdate = (projectId: string, updatedTasks: Project['tasks']) => {
     const projectToUpdate = projects.find(p => p.id === projectId);
     if(projectToUpdate) {
-        const newProgress = Math.round((updatedTasks.filter(t => t.status === 'Done').length / updatedTasks.length) * 100) || 0;
-        onUpdateProject({ ...projectToUpdate, tasks: updatedTasks, progress: newProgress });
+        const oldProgress = projectToUpdate.progress;
+        const newProgress = updatedTasks.length > 0 ? Math.round((updatedTasks.filter(t => t.status === 'Done').length / updatedTasks.length) * 100) : 0;
+        
+        const updatedProject = { ...projectToUpdate, tasks: updatedTasks, progress: newProgress };
+        onUpdateProject(updatedProject);
+
+        if (newProgress >= 100 && oldProgress < 100) {
+            setProjectToComplete(updatedProject);
+        }
     }
   }
+  
+  const handleSaveCompletionNote = (note: string) => {
+    if (projectToComplete) {
+      onUpdateProject({ ...projectToComplete, completionNote: note });
+      setProjectToComplete(null);
+    }
+  };
 
   return (
     <Card>
@@ -181,6 +197,14 @@ export function ProjectsTable({ projects, users, onUpdateProject }: ProjectsTabl
           isOpen={!!activeMindMap}
           onClose={() => setActiveMindMap(null)}
           project={activeMindMap}
+        />
+      )}
+      {projectToComplete && (
+        <CompletionNoteDialog
+          project={projectToComplete}
+          isOpen={!!projectToComplete}
+          onClose={() => setProjectToComplete(null)}
+          onSave={handleSaveCompletionNote}
         />
       )}
     </Card>
