@@ -5,7 +5,6 @@ import Image from "next/image"
 import {
   Archive,
   LayoutGrid,
-  Settings,
   User as UserIcon,
   Users as UsersIcon,
 } from "lucide-react"
