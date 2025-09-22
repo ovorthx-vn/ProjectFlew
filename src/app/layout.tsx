@@ -35,7 +35,8 @@ export default function RootLayout({
   
   const childrenWithProps = React.Children.map(children, child => {
     if (React.isValidElement(child)) {
-      return React.cloneElement(child, { users, addUser, updateUser } as any);
+      // @ts-ignore
+      return React.cloneElement(child, { users, addUser, updateUser });
     }
     return child;
   });
