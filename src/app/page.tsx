@@ -69,6 +69,7 @@ export default function DashboardPage({ users }: { users: User[] }) {
   }
 
   React.useEffect(() => {
+    if (!users) return;
     setProjects(currentProjects => {
       return currentProjects.map(p => ({
         ...p,

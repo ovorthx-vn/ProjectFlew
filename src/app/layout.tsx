@@ -20,10 +20,11 @@ export default function RootLayout({
 }>) {
   const [users, setUsers] = React.useState<User[]>(initialUsers);
   
-  const addUser = (user: Omit<User, 'id'>) => {
+  const addUser = (user: Omit<User, 'id' | 'avatar'>) => {
     const newUser: User = {
       ...user,
       id: `user-${Date.now()}`,
+      avatar: `https://picsum.photos/seed/user${Date.now()}/40/40`,
     }
     setUsers(prev => [newUser, ...prev]);
   }
