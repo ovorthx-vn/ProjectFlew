@@ -207,9 +207,16 @@ export default function WorkspaceDetailPage({ params }: { params: { id: string }
                             <CardDescription>Your study playlist.</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <div className="aspect-video bg-muted rounded-md flex items-center justify-center">
-                                <p className="text-muted-foreground text-sm">Spotify player placeholder</p>
-                            </div>
+                             <iframe 
+                                style={{ borderRadius: "12px" }}
+                                src="https://open.spotify.com/embed/playlist/37i9dQZF1DX84kJlLzHUB2?utm_source=generator" 
+                                width="100%" 
+                                height="352" 
+                                frameBorder="0" 
+                                allowFullScreen={true} 
+                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                                loading="lazy">
+                            </iframe>
                         </CardContent>
                     </Card>
                     <Card>
