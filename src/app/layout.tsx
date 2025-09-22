@@ -7,6 +7,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from "@/components/ui/toaster";
 import { UserProvider } from '@/context/user-context';
 import { ProjectProvider } from '@/context/project-context';
+import { WorkspaceProvider } from '@/context/workspace-context';
 import { FontProvider, useFont } from '@/context/font-context';
 import { cn } from '@/lib/utils';
 
@@ -28,7 +29,9 @@ function AppBody({ children }: { children: React.ReactNode }) {
       <ThemeProvider defaultTheme="dark" storageKey="projectflow-theme">
         <UserProvider>
           <ProjectProvider>
-            {children}
+            <WorkspaceProvider>
+              {children}
+            </WorkspaceProvider>
           </ProjectProvider>
         </UserProvider>
         <Toaster />

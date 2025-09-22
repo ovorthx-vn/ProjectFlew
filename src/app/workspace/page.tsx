@@ -39,29 +39,15 @@ import {
 import { Icons } from "@/components/icons"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { workspaces as initialWorkspaces } from "@/lib/data"
 import { Badge } from "@/components/ui/badge"
 import { CreateWorkspaceDialog } from "@/components/workspace/create-workspace-dialog"
 import type { Workspace } from "@/lib/types"
+import { useWorkspace } from "@/context/workspace-context"
 
 export default function WorkspaceListPage() {
   const [isCollapsed, setIsCollapsed] = React.useState(false)
-  const [workspaces, setWorkspaces] = React.useState<Workspace[]>(initialWorkspaces);
+  const { workspaces, addWorkspace } = useWorkspace();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false);
-
-  const handleAddWorkspace = (newWorkspaceData: Omit<Workspace, 'id' | 'mainNote' | 'quickNotes'>) => {
-    const newWorkspace: Workspace = {
-      ...newWorkspaceData,
-      id: `ws-${Date.now()}`,
-      mainNote: `Start your notes here for ${newWorkspaceData.subject}...`,
-      quickNotes: [
-        { id: `qn-${Date.now()}-1`, title: 'Key Topics', content: '- Topic 1\n- Topic 2\n- Topic 3' },
-        { id: `qn-${Date.now()}-2`, title: 'Resources', content: '- Book/Chapter\n- Website URL' },
-        { id: `qn-${Date.now()}-3`, title: 'Action Items', content: '- [ ] Read chapter 5\n- [ ] Review lecture notes' },
-      ],
-    };
-    setWorkspaces(prev => [newWorkspace, ...prev]);
-  };
 
   return (
     <SidebarProvider defaultOpen onOpenChange={(open) => setIsCollapsed(!open)}>
@@ -181,7 +167,7 @@ export default function WorkspaceListPage() {
       <CreateWorkspaceDialog
         isOpen={isCreateDialogOpen}
         onClose={() => setIsCreateDialogOpen(false)}
-        onAddWorkspace={handleAddWorkspace}
+        onAddWorkspace={addWorkspace}
       />
     </SidebarProvider>
   )

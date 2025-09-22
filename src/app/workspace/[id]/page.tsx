@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import Image from "next/image"
-import Link from "next/link"
 import {
   Archive,
   LayoutGrid,
@@ -43,20 +42,35 @@ import { Icons } from "@/components/icons"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
-import { workspaces } from "@/lib/data"
 import type { Workspace, QuickNote } from "@/lib/types"
-import { Badge } from "@/components/ui/badge"
 import { NoteDialog } from "@/components/workspace/note-dialog"
+import { useWorkspace } from "@/context/workspace-context"
 
 export default function WorkspaceDetailPage({ params }: { params: { id: string } }) {
   const [isCollapsed, setIsCollapsed] = React.useState(false)
+  const { workspaces, updateWorkspace } = useWorkspace();
   const [workspace, setWorkspace] = React.useState<Workspace | null>(null);
   const [selectedNote, setSelectedNote] = React.useState<QuickNote | null>(null)
+  const [mainNote, setMainNote] = React.useState('');
+
 
   React.useEffect(() => {
     const foundWorkspace = workspaces.find(ws => ws.id === params.id);
     setWorkspace(foundWorkspace || null);
-  }, [params]);
+    if (foundWorkspace) {
+      setMainNote(foundWorkspace.mainNote);
+    }
+  }, [params, workspaces]);
+
+  const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMainNote(e.target.value);
+  }
+
+  const handleSaveNote = () => {
+    if (workspace) {
+      updateWorkspace({ ...workspace, mainNote });
+    }
+  }
 
   if (!workspace) {
     return (
@@ -196,13 +210,19 @@ export default function WorkspaceDetailPage({ params }: { params: { id: string }
                 </Card>
             </div>
             <div className="lg:col-span-2">
-                <Card className="h-full">
+                <Card className="h-full flex flex-col">
                     <CardHeader>
                         <CardTitle>Notes</CardTitle>
                         <CardDescription>Your main area for taking notes for {workspace.subject}.</CardDescription>
                     </CardHeader>
-                    <CardContent>
-                        <Textarea className="h-[60vh]" placeholder="Start typing your notes here..." defaultValue={workspace.mainNote} />
+                    <CardContent className="flex-grow flex flex-col">
+                        <Textarea 
+                            className="h-full flex-grow" 
+                            placeholder="Start typing your notes here..." 
+                            value={mainNote}
+                            onChange={handleNoteChange}
+                            onBlur={handleSaveNote}
+                        />
                     </CardContent>
                 </Card>
             </div>
