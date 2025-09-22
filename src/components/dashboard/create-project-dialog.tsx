@@ -1,7 +1,7 @@
 "use client"
 import * as React from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon, Search } from "lucide-react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { format } from 'date-fns'
@@ -67,6 +67,8 @@ export function CreateProjectDialog({
   onAddProject,
   users,
 }: CreateProjectDialogProps) {
+  const [searchQuery, setSearchQuery] = React.useState("");
+  
   const form = useForm<ProjectFormValues>({
     resolver: zodResolver(projectFormSchema),
     defaultValues: {
@@ -81,11 +83,23 @@ export function CreateProjectDialog({
     const selectedMembers = users.filter(user => data.members.includes(user.id));
     onAddProject({ ...data, members: selectedMembers });
     form.reset();
+    setSearchQuery("");
     onClose();
   }
 
+  const filteredUsers = users.filter(user => 
+    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.role.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+        if (!open) {
+          form.reset();
+          setSearchQuery("");
+        }
+        onClose();
+    }}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Create New Project</DialogTitle>
@@ -175,8 +189,17 @@ export function CreateProjectDialog({
                 render={() => (
                     <FormItem>
                         <FormLabel>Assign Members</FormLabel>
+                        <div className="relative mb-2">
+                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder="Search members..."
+                                className="pl-8"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
                         <div className="space-y-2 rounded-md border p-4 max-h-48 overflow-y-auto">
-                            {users && users.map((item) => (
+                            {filteredUsers.length > 0 ? filteredUsers.map((item) => (
                                 <FormField
                                     key={item.id}
                                     control={form.control}
@@ -212,7 +235,9 @@ export function CreateProjectDialog({
                                         )
                                     }}
                                 />
-                            ))}
+                            )) : (
+                              <p className="text-center text-sm text-muted-foreground">No members found.</p>
+                            )}
                         </div>
                         <FormMessage />
                     </FormItem>

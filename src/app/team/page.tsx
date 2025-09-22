@@ -9,7 +9,8 @@ import {
   User as UserIcon,
   Users as UsersIcon,
   MoreHorizontal,
-  PlusCircle
+  PlusCircle,
+  Search
 } from "lucide-react"
 
 import type { User } from "@/lib/types"
@@ -44,12 +45,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { EditMemberDialog } from "@/components/team/edit-member-dialog"
 import { CreateMemberDialog } from "@/components/settings/create-member-dialog"
 import { useUser } from "@/context/user-context"
+import { Input } from "@/components/ui/input"
 
 export default function TeamPage() {
   const { users, addUser, updateUser } = useUser();
   const [isCollapsed, setIsCollapsed] = React.useState(false)
   const [editingUser, setEditingUser] = React.useState<User | null>(null);
   const [isCreateMemberOpen, setIsCreateMemberOpen] = React.useState(false)
+  const [searchQuery, setSearchQuery] = React.useState("");
 
   const handleEditUser = (user: User) => {
     setEditingUser(user);
@@ -59,6 +62,11 @@ export default function TeamPage() {
     updateUser(updatedUser);
   };
   
+  const filteredUsers = users.filter(user => 
+    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.role.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <SidebarProvider defaultOpen onOpenChange={(open) => setIsCollapsed(!open)}>
       <Sidebar
@@ -145,6 +153,16 @@ export default function TeamPage() {
             <h1 className="font-headline text-xl font-semibold">Team</h1>
           </div>
           <div className="flex items-center gap-2">
+            <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                    type="search"
+                    placeholder="Search members..."
+                    className="pl-8 sm:w-[300px]"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
+            </div>
             <Button onClick={() => setIsCreateMemberOpen(true)}>
               <PlusCircle className="mr-2 h-4 w-4" />
               Add Member
@@ -169,7 +187,7 @@ export default function TeamPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {users && users.map((user) => (
+                    {filteredUsers.length > 0 ? filteredUsers.map((user) => (
                       <TableRow key={user.id}>
                         <TableCell>
                           <div className="flex items-center gap-2">
@@ -209,7 +227,13 @@ export default function TeamPage() {
                           </DropdownMenu>
                         </TableCell>
                       </TableRow>
-                    ))}
+                    )) : (
+                      <TableRow>
+                        <TableCell colSpan={4} className="h-24 text-center">
+                          No members found.
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>

@@ -1,7 +1,7 @@
 "use client"
 import * as React from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2, Sparkles } from "lucide-react"
+import { Loader2, Sparkles, Search } from "lucide-react"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 
@@ -24,6 +24,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
 import { Checkbox } from "../ui/checkbox"
 import { Label } from "../ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
@@ -53,6 +54,7 @@ export function AssignTeamDialog({
 }: AssignTeamDialogProps) {
   const { toast } = useToast()
   const [isSuggesting, setIsSuggesting] = React.useState(false)
+  const [searchQuery, setSearchQuery] = React.useState("");
 
   const form = useForm<AssignTeamFormValues>({
     resolver: zodResolver(assignTeamFormSchema),
@@ -68,6 +70,12 @@ export function AssignTeamDialog({
       })
     }
   }, [task, form])
+
+  React.useEffect(() => {
+    if (!isOpen) {
+      setSearchQuery("");
+    }
+  }, [isOpen])
 
   if (!task) return null
 
@@ -120,6 +128,11 @@ export function AssignTeamDialog({
     onClose()
   }
 
+  const filteredUsers = projectUsers.filter(user => 
+    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.role.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
@@ -136,7 +149,7 @@ export function AssignTeamDialog({
                 name="members"
                 render={() => (
                     <FormItem>
-                        <div className="mb-4 flex justify-between items-center">
+                        <div className="mb-2 flex justify-between items-center">
                             <FormLabel className="text-base">Team Members</FormLabel>
                              <Button type="button" size="sm" onClick={handleSuggestion} disabled={isSuggesting}>
                                 {isSuggesting ? (
@@ -147,8 +160,17 @@ export function AssignTeamDialog({
                                 Suggest Team
                             </Button>
                         </div>
+                        <div className="relative mb-2">
+                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder="Search members..."
+                                className="pl-8"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
                         <div className="space-y-3 rounded-md border p-4 max-h-60 overflow-y-auto">
-                            {projectUsers.map((item) => (
+                            {filteredUsers.length > 0 ? filteredUsers.map((item) => (
                                 <FormField
                                     key={item.id}
                                     control={form.control}
@@ -193,7 +215,9 @@ export function AssignTeamDialog({
                                         )
                                     }}
                                 />
-                            ))}
+                            )) : (
+                               <p className="text-center text-sm text-muted-foreground">No members found.</p>
+                            )}
                         </div>
                         <FormMessage />
                     </FormItem>
