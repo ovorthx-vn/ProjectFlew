@@ -2,7 +2,7 @@
 
 ProjectFlow is a modern, feature-rich application designed to streamline project management and enhance personal productivity. It combines a powerful project tracking system with a dedicated student workspace, all powered by a cutting-edge tech stack.
 
-![ProjectFlow Dashboard](https://picsum.photos/seed/screenshot/1200/675)
+![ProjectFlow Dashboard](/link here)
 *<p align="center">A preview of the ProjectFlow dashboard.</p>*
 
 ---
