@@ -45,7 +45,7 @@ export const projects: Project[] = [
     id: 'proj-3',
     name: 'SaaS Analytics Dashboard',
     dueDate: new Date('2025-01-20'),
-    progress: 90,
+    progress: 100,
     members: [users[1], users[2], users[4]],
     createdAt: new Date('2024-06-20'),
     mindMapUrl: 'https://picsum.photos/seed/mindmap1/800/600',

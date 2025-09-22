@@ -77,7 +77,7 @@ export default function SettingsPage() {
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton href="#">
+              <SidebarMenuButton href="/archive">
                 <Archive />
                 Archive
               </SidebarMenuButton>

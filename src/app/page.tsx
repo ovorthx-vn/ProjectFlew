@@ -95,6 +95,8 @@ export default function DashboardPage() {
     }
     return acc;
   }, {} as Record<string, (Task & { project: string, projectId: string, projectDueDate: Date })[]>);
+  
+  const activeProjects = projects.filter(p => p.progress < 100);
 
   const DayWithDot: React.FC<{day: Date}> = ({ day }) => {
     const dateStr = format(day, 'yyyy-MM-dd');
@@ -161,7 +163,7 @@ export default function DashboardPage() {
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton href="#">
+              <SidebarMenuButton href="/archive">
                 <Archive />
                 Archive
               </SidebarMenuButton>
@@ -247,7 +249,7 @@ export default function DashboardPage() {
           </div>
         </header>
         <main className="flex-1 p-4 sm:p-6">
-            <ProjectsView projects={projects} users={users} onAddProject={addProject} onUpdateProject={updateProject} />
+            <ProjectsView projects={activeProjects} users={users} onAddProject={addProject} onUpdateProject={updateProject} />
         </main>
       </SidebarInset>
     </SidebarProvider>
