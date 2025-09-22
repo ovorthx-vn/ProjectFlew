@@ -14,7 +14,8 @@ import {
   Music,
   StickyNote,
   MoreHorizontal,
-  PlusCircle
+  PlusCircle,
+  Pencil
 } from "lucide-react"
 import { format } from "date-fns"
 
@@ -49,6 +50,7 @@ import { NoteDialog } from "@/components/workspace/note-dialog"
 import { useWorkspace } from "@/context/workspace-context"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { SaveNoteDialog } from "@/components/workspace/save-note-dialog"
+import { SpotifyLinkDialog } from "@/components/workspace/spotify-link-dialog"
 
 export default function WorkspaceDetailPage({ params }: { params: { id: string } }) {
   const [isCollapsed, setIsCollapsed] = React.useState(false)
@@ -57,6 +59,7 @@ export default function WorkspaceDetailPage({ params }: { params: { id: string }
   const [selectedNote, setSelectedNote] = React.useState<QuickNote | null>(null)
   const [mainNote, setMainNote] = React.useState('');
   const [isSaveNoteDialogOpen, setIsSaveNoteDialogOpen] = React.useState(false);
+  const [isSpotifyLinkDialogOpen, setIsSpotifyLinkDialogOpen] = React.useState(false);
 
 
   React.useEffect(() => {
@@ -90,6 +93,20 @@ export default function WorkspaceDetailPage({ params }: { params: { id: string }
         }
         updateWorkspace(updatedWorkspace);
     }
+  }
+
+  const handleSaveSpotifyLink = (link: string) => {
+    if (workspace) {
+      updateWorkspace({ ...workspace, spotifyPlaylistUrl: link });
+    }
+  };
+
+  const getSpotifyEmbedUrl = (url: string | undefined): string => {
+    if (!url || !url.includes('spotify.com/playlist/')) {
+        return "https://open.spotify.com/embed/playlist/37i9dQZF1DX84kJlLzHUB2?utm_source=generator";
+    }
+    const embedUrl = url.replace('/playlist/', '/embed/playlist/');
+    return embedUrl;
   }
 
   if (!workspace) {
@@ -202,14 +219,19 @@ export default function WorkspaceDetailPage({ params }: { params: { id: string }
             <ScrollArea className="h-full">
                 <div className="lg:col-span-1 space-y-6 pr-4">
                     <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2"><Music /> Spotify</CardTitle>
-                            <CardDescription>Your study playlist.</CardDescription>
+                        <CardHeader className="flex flex-row items-center justify-between">
+                            <div>
+                                <CardTitle className="flex items-center gap-2"><Music /> Spotify</CardTitle>
+                                <CardDescription>Your study playlist.</CardDescription>
+                            </div>
+                            <Button variant="ghost" size="icon" onClick={() => setIsSpotifyLinkDialogOpen(true)}>
+                                <Pencil className="h-4 w-4" />
+                            </Button>
                         </CardHeader>
                         <CardContent>
                              <iframe 
                                 style={{ borderRadius: "12px" }}
-                                src="https://open.spotify.com/embed/playlist/37i9dQZF1DX84kJlLzHUB2?utm_source=generator" 
+                                src={getSpotifyEmbedUrl(workspace.spotifyPlaylistUrl)}
                                 width="100%" 
                                 height="352" 
                                 frameBorder="0" 
@@ -286,6 +308,12 @@ export default function WorkspaceDetailPage({ params }: { params: { id: string }
           isOpen={isSaveNoteDialogOpen}
           onClose={() => setIsSaveNoteDialogOpen(false)}
           onSave={handleSaveAsQuickNote}
+      />
+      <SpotifyLinkDialog
+        isOpen={isSpotifyLinkDialogOpen}
+        onClose={() => setIsSpotifyLinkDialogOpen(false)}
+        onSave={handleSaveSpotifyLink}
+        currentUrl={workspace.spotifyPlaylistUrl}
       />
     </SidebarProvider>
   )

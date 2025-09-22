@@ -46,4 +46,5 @@ export type Workspace = {
   dueDate: Date;
   mainNote: string;
   quickNotes: QuickNote[];
+  spotifyPlaylistUrl?: string;
 };
