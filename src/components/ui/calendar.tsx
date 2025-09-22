@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import { DayPicker, DropdownProps } from "react-day-picker"
 
 import { cn } from "@/lib/utils"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { buttonVariants } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select"
 import { ScrollArea } from "./scroll-area"
 
@@ -26,7 +26,6 @@ function Calendar({
   };
 
   return (
-    <div className="relative">
       <DayPicker
         showOutsideDays={showOutsideDays}
         className={cn("p-3", className)}
@@ -114,16 +113,6 @@ function Calendar({
         }}
         {...props}
       />
-      <div className="p-3 pt-0 flex justify-end">
-        <Button
-            variant="outline"
-            size="sm"
-            onClick={() => props.onSelect?.(new Date(), new Date(), {})}
-        >
-            Today
-        </Button>
-      </div>
-    </div>
   )
 }
 Calendar.displayName = "Calendar"

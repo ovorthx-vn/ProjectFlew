@@ -40,11 +40,11 @@ export const projects: Project[] = [
     notes: 'Initial notes for the e-commerce platform project.',
     mindMap: ecommerceMindMap,
     tasks: [
-      { id: 'task-1-4', title: 'Setup database schema', status: 'Done', assigned: [users[1]], startDate: new Date('2024-07-10'), dueDate: new Date('2024-07-18'), priority: 'High', dependencies: [] },
-      { id: 'task-1-1', title: 'Design product page', status: 'Done', assigned: [users[2]], startDate: new Date('2024-07-15'), dueDate: new Date('2024-07-20'), priority: 'High', dependencies: [] },
-      { id: 'task-1-2', title: 'Develop authentication API', status: 'In Progress', assigned: [users[1]], startDate: new Date('2024-07-20'), dueDate: new Date('2024-07-28'), priority: 'High', dependencies: ['task-1-4'] },
-      { id: 'task-1-3', title: 'Implement checkout flow UI', status: 'In Progress', assigned: [users[0], users[2]], startDate: new Date('2024-07-25'), dueDate: new Date('2024-08-05'), priority: 'Medium', dependencies: ['task-1-1', 'task-1-2'] },
-      { id: 'task-1-5', title: 'Write e2e tests for checkout', status: 'To-Do', assigned: [], priority: 'Medium', startDate: new Date('2024-08-06'), dueDate: new Date('2024-08-12'), dependencies: ['task-1-3'] },
+      { id: 'task-1-4', title: 'Setup database schema', status: 'Done', assigned: [users[1]], startDate: new Date('2024-07-10'), dueDate: new Date('2024-07-18'), dependencies: [] },
+      { id: 'task-1-1', title: 'Design product page', status: 'Done', assigned: [users[2]], startDate: new Date('2024-07-15'), dueDate: new Date('2024-07-20'), dependencies: [] },
+      { id: 'task-1-2', title: 'Develop authentication API', status: 'In Progress', assigned: [users[1]], startDate: new Date('2024-07-20'), dueDate: new Date('2024-07-28'), dependencies: ['task-1-4'] },
+      { id: 'task-1-3', title: 'Implement checkout flow UI', status: 'In Progress', assigned: [users[0], users[2]], startDate: new Date('2024-07-25'), dueDate: new Date('2024-08-05'), dependencies: ['task-1-1', 'task-1-2'] },
+      { id: 'task-1-5', title: 'Write e2e tests for checkout', status: 'To-Do', assigned: [], startDate: new Date('2024-08-06'), dueDate: new Date('2024-08-12'), dependencies: ['task-1-3'] },
     ],
   },
   {
@@ -58,10 +58,10 @@ export const projects: Project[] = [
     notes: 'Focus on security and performance.',
     mindMap: '',
     tasks: [
-      { id: 'task-2-1', title: 'User research and wireframing', status: 'Done', assigned: [users[2]], startDate: new Date('2024-07-01'), dueDate: new Date('2024-07-15'), priority: 'Urgent', dependencies: [] },
-      { id: 'task-2-2', title: 'Create component library', status: 'In Progress', assigned: [users[0]], startDate: new Date('2024-07-16'), dueDate: new Date('2024-07-28'), priority: 'High', dependencies: ['task-2-1'] },
-      { id: 'task-2-3', title: 'Implement fund transfer feature', status: 'To-Do', assigned: [], startDate: new Date('2024-08-01'), dueDate: new Date('2024-08-15'), priority: 'Urgent', dependencies: ['task-2-2'] },
-      { id: 'task-2-4', title: 'Performance testing on Android', status: 'Backlog', assigned: [], priority: 'Medium', dependencies: ['task-2-3'] },
+      { id: 'task-2-1', title: 'User research and wireframing', status: 'Done', assigned: [users[2]], startDate: new Date('2024-07-01'), dueDate: new Date('2024-07-15'), dependencies: [] },
+      { id: 'task-2-2', title: 'Create component library', status: 'In Progress', assigned: [users[0]], startDate: new Date('2024-07-16'), dueDate: new Date('2024-07-28'), dependencies: ['task-2-1'] },
+      { id: 'task-2-3', title: 'Implement fund transfer feature', status: 'To-Do', assigned: [], startDate: new Date('2024-08-01'), dueDate: new Date('2024-08-15'), dependencies: ['task-2-2'] },
+      { id: 'task-2-4', title: 'Performance testing on Android', status: 'Backlog', assigned: [], dependencies: ['task-2-3'] },
     ],
   },
   {
@@ -74,9 +74,9 @@ export const projects: Project[] = [
     members: [users[1], users[2], users[4]],
     mindMap: '',
     tasks: [
-      { id: 'task-3-1', title: 'API for data aggregation', status: 'Done', assigned: [users[1]], priority: 'High' },
-      { id: 'task-3-2', title: 'Real-time chart components', status: 'Done', assigned: [users[0]], priority: 'Medium' },
-      { id: 'task-3-3', title: 'Dashboard layout design', status: 'Done', assigned: [users[2]], priority: 'Medium' },
+      { id: 'task-3-1', title: 'API for data aggregation', status: 'Done', assigned: [users[1]] },
+      { id: 'task-3-2', title: 'Real-time chart components', status: 'Done', assigned: [users[0]] },
+      { id: 'task-3-3', title: 'Dashboard layout design', status: 'Done', assigned: [users[2]] },
     ],
   },
   {
@@ -89,7 +89,7 @@ export const projects: Project[] = [
     members: [users[0], users[4]],
     mindMap: '',
     tasks: [
-        { id: 'task-4-1', title: 'Define requirements', status: 'In Progress', assigned: [users[3]], startDate: new Date('2024-07-18'), dueDate: new Date('2024-07-25'), priority: 'Low' }
+        { id: 'task-4-1', title: 'Define requirements', status: 'In Progress', assigned: [users[3]], startDate: new Date('2024-07-18'), dueDate: new Date('2024-07-25') }
     ],
   },
 ];

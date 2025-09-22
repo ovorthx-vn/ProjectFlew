@@ -16,7 +16,6 @@ export type Task = {
   notes?: string;
   startDate?: Date;
   dueDate?: Date;
-  priority: Priority;
   dependencies?: string[];
 };
 
