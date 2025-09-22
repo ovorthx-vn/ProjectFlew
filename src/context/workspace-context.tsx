@@ -16,14 +16,15 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const [workspaces, setWorkspaces] = React.useState<Workspace[]>(initialWorkspaces);
 
   const addWorkspace = (workspace: Omit<Workspace, 'id' | 'mainNote' | 'quickNotes'>) => {
+    const newIdSuffix = workspaces.length + 1;
     const newWorkspace: Workspace = {
       ...workspace,
-      id: `ws-${Date.now()}`,
+      id: `ws-${newIdSuffix}`,
       mainNote: `Start your notes here for ${workspace.subject}...`,
       quickNotes: [
-        { id: `qn-${Date.now()}-1`, title: 'Key Topics', content: '- Topic 1\n- Topic 2\n- Topic 3' },
-        { id: `qn-${Date.now()}-2`, title: 'Resources', content: '- Book/Chapter\n- Website URL' },
-        { id: `qn-${Date.now()}-3`, title: 'Action Items', content: '- [ ] Read chapter 5\n- [ ] Review lecture notes' },
+        { id: `qn-${newIdSuffix}-1`, title: 'Key Topics', content: '- Topic 1\n- Topic 2\n- Topic 3' },
+        { id: `qn-${newIdSuffix}-2`, title: 'Resources', content: '- Book/Chapter\n- Website URL' },
+        { id: `qn-${newIdSuffix}-3`, title: 'Action Items', content: '- [ ] Read chapter 5\n- [ ] Review lecture notes' },
       ],
       spotifyPlaylistUrl: 'https://open.spotify.com/playlist/37i9dQZF1DX84kJlLzHUB2'
     };
