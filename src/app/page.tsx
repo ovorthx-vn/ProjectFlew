@@ -91,7 +91,7 @@ export default function DashboardPage() {
           <PopoverTrigger asChild>
             <div className="relative">
               {format(day, 'd')}
-              <span className="absolute top-0 right-0 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
+              <span className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
             </div>
           </PopoverTrigger>
           <PopoverContent className="w-80">
@@ -103,9 +103,9 @@ export default function DashboardPage() {
                     <CardHeader className="p-4">
                       <CardTitle className="text-sm">{task.title}</CardTitle>
                     </CardHeader>
-                    <CardContent className="p-4 pt-0 text-xs text-muted-foreground">
+                    <CardContent className="p-4 pt-0 text-xs text-muted-foreground space-y-1">
                       <p>Project: {task.project}</p>
-                      <p>Status: <Badge variant="secondary">{task.status}</Badge></p>
+                      <div className="flex items-center">Status: <Badge variant="secondary" className="ml-1">{task.status}</Badge></div>
                     </CardContent>
                   </Card>
                 ))}
