@@ -115,7 +115,7 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                             return (
                                 <div 
                                     key={month.toString()} 
-                                    className={cn("text-center text-xs font-semibold shrink-0", index < months.length -1 && "border-r")}
+                                    className={cn("text-center text-xs font-semibold shrink-0 flex items-center justify-center", index < months.length -1 && "border-r")}
                                     style={{ width: `${monthWidth}px` }}
                                 >
                                 {displayYear ? format(month, 'MMM yyyy') : format(month, 'MMM')}
@@ -127,7 +127,7 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                     {/* Today marker */}
                     <div className="absolute top-0 h-full" style={{ left: `${getPosition(new Date())}px`}}>
                         <div className="w-px h-full bg-primary" />
-                        <div className="absolute -top-1 -translate-x-1/2">
+                        <div className="absolute -top-2 -translate-x-1/2">
                             <div className="bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-full">
                             Today
                             </div>
