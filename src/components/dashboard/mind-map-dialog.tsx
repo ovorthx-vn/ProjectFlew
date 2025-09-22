@@ -1,7 +1,6 @@
 "use client"
 import * as React from "react"
-import Image from "next/image"
-
+import type { Project } from "@/lib/types"
 import {
   Dialog,
   DialogContent,
@@ -9,41 +8,26 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { AspectRatio } from "@/components/ui/aspect-ratio"
+import { MindMapEditor } from "./mind-map-editor"
 
 interface MindMapDialogProps {
   isOpen: boolean
   onClose: () => void
-  projectName: string
-  mindMapUrl?: string
+  project: Project
 }
 
-export function MindMapDialog({ isOpen, onClose, projectName, mindMapUrl }: MindMapDialogProps) {
+export function MindMapDialog({ isOpen, onClose, project }: MindMapDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-3xl">
+      <DialogContent className="sm:max-w-4xl h-[80vh]">
         <DialogHeader>
-          <DialogTitle>Mind Map: {projectName}</DialogTitle>
+          <DialogTitle>Mind Map: {project.name}</DialogTitle>
           <DialogDescription>
-            Visual representation of the project structure and ideas.
+            Create and organize your project ideas visually.
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4">
-            {mindMapUrl ? (
-                <AspectRatio ratio={16 / 9}>
-                    <Image 
-                        src={mindMapUrl} 
-                        alt={`Mind map for ${projectName}`} 
-                        className="rounded-md object-cover"
-                        data-ai-hint="abstract diagram"
-                        fill
-                    />
-                </AspectRatio>
-            ) : (
-                <div className="flex items-center justify-center h-60 rounded-md border border-dashed text-muted-foreground">
-                    No mind map available for this project.
-                </div>
-            )}
+        <div className="h-full py-4">
+            <MindMapEditor project={project} />
         </div>
       </DialogContent>
     </Dialog>

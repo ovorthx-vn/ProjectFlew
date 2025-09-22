@@ -2,7 +2,7 @@
 import * as React from "react"
 import Image from "next/image"
 import { format } from "date-fns"
-import { ChevronDown, ChevronRight, FolderKanban, MoreHorizontal, Loader2, BrainCircuit } from "lucide-react"
+import { ChevronDown, ChevronRight, FolderKanban, MoreHorizontal, BrainCircuit } from "lucide-react"
 
 import type { Project, User } from "@/lib/types"
 import { Button } from "@/components/ui/button"
@@ -25,9 +25,6 @@ import {
 import { MindMapDialog } from "./mind-map-dialog"
 import { NotesPopover } from "./notes-popover"
 import { TasksList } from "./tasks-list"
-import { Badge } from "../ui/badge"
-import { generateMindMapAction } from "@/lib/actions"
-import { useToast } from "@/hooks/use-toast"
 
 interface ProjectsTableProps {
   projects: Project[]
@@ -36,10 +33,8 @@ interface ProjectsTableProps {
 }
 
 export function ProjectsTable({ projects, users, onUpdateProject }: ProjectsTableProps) {
-  const { toast } = useToast();
   const [expandedRows, setExpandedRows] = React.useState<Set<string>>(new Set())
   const [activeMindMap, setActiveMindMap] = React.useState<Project | null>(null)
-  const [generatingMindMapId, setGeneratingMindMapId] = React.useState<string | null>(null)
 
   const toggleRow = (id: string) => {
     const newSet = new Set(expandedRows)
@@ -62,27 +57,6 @@ export function ProjectsTable({ projects, users, onUpdateProject }: ProjectsTabl
         onUpdateProject({ ...projectToUpdate, tasks: updatedTasks, progress: newProgress });
     }
   }
-
-  const handleGenerateMindMap = async (project: Project) => {
-    setGeneratingMindMapId(project.id);
-    try {
-      const mindMapUrl = await generateMindMapAction({
-        projectName: project.name,
-        projectDescription: project.notes || '',
-        tasks: project.tasks.map(t => t.title),
-      });
-      onUpdateProject({ ...project, mindMapUrl });
-      setActiveMindMap({ ...project, mindMapUrl });
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Mind map generation failed',
-        description: 'Could not generate a mind map for this project. Please try again.',
-      });
-    } finally {
-      setGeneratingMindMapId(null);
-    }
-  };
 
   return (
     <Card>
@@ -156,30 +130,14 @@ export function ProjectsTable({ projects, users, onUpdateProject }: ProjectsTabl
                             notes={project.notes} 
                             onSave={(newNotes) => handleNoteSave(project, newNotes)}
                         />
-                        {project.mindMapUrl ? (
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setActiveMindMap(project)}>
-                                <FolderKanban className="h-4 w-4" />
-                            </Button>
-                        ) : (
-                           <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-8 w-8"
-                                  onClick={() => handleGenerateMindMap(project)}
-                                  disabled={generatingMindMapId === project.id}
-                                >
-                                  {generatingMindMapId === project.id ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                  ) : (
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setActiveMindMap(project)}>
                                     <BrainCircuit className="h-4 w-4" />
-                                  )}
                                 </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>Generate Mind Map</TooltipContent>
-                            </Tooltip>
-                        )}
+                            </TooltipTrigger>
+                            <TooltipContent>Open Mind Map</TooltipContent>
+                        </Tooltip>
                       </TableCell>
                     </TableRow>
                     {expandedRows.has(project.id) && (
@@ -207,8 +165,7 @@ export function ProjectsTable({ projects, users, onUpdateProject }: ProjectsTabl
         <MindMapDialog
           isOpen={!!activeMindMap}
           onClose={() => setActiveMindMap(null)}
-          projectName={activeMindMap.name}
-          mindMapUrl={activeMindMap.mindMapUrl}
+          project={activeMindMap}
         />
       )}
     </Card>
