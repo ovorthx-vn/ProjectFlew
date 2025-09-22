@@ -202,7 +202,7 @@ export default function WorkspaceDetailPage({ params }: { params: { id: string }
                         <CardDescription>Your main area for taking notes for {workspace.subject}.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <Textarea className="h-[60vh]" placeholder="Start typing your notes here..."/>
+                        <Textarea className="h-[60vh]" placeholder="Start typing your notes here..." defaultValue={workspace.mainNote} />
                     </CardContent>
                 </Card>
             </div>

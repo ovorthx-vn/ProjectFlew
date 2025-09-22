@@ -53,8 +53,12 @@ export default function WorkspaceListPage() {
     const newWorkspace: Workspace = {
       ...newWorkspaceData,
       id: `ws-${Date.now()}`,
-      mainNote: '',
-      quickNotes: [],
+      mainNote: `Start your notes here for ${newWorkspaceData.subject}...`,
+      quickNotes: [
+        { id: `qn-${Date.now()}-1`, title: 'Key Topics', content: '- Topic 1\n- Topic 2\n- Topic 3' },
+        { id: `qn-${Date.now()}-2`, title: 'Resources', content: '- Book/Chapter\n- Website URL' },
+        { id: `qn-${Date.now()}-3`, title: 'Action Items', content: '- [ ] Read chapter 5\n- [ ] Review lecture notes' },
+      ],
     };
     setWorkspaces(prev => [newWorkspace, ...prev]);
   };
