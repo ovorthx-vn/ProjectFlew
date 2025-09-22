@@ -8,12 +8,12 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CreateProjectDialog } from "./create-project-dialog"
 import { ProjectsTable } from "./projects-table"
-import { ProjectsChart } from "./projects-chart"
+import { ProjectsTimeline } from "./projects-timeline"
 
 interface ProjectsViewProps {
   projects: Project[]
   users: User[]
-  onAddProject: (project: Omit<Project, 'id' | 'createdAt' | 'tasks' | 'progress'>) => void
+  onAddProject: (project: Omit<Project, 'id' | 'createdAt' | 'tasks' | 'progress' | 'mindMap'>) => void
   onUpdateProject: (project: Project) => void;
 }
 
@@ -41,13 +41,13 @@ export function ProjectsView({ projects, users, onAddProject, onUpdateProject }:
       <Tabs defaultValue="table" className="pt-4">
         <TabsList>
           <TabsTrigger value="table">Table View</TabsTrigger>
-          <TabsTrigger value="chart">Chart View</TabsTrigger>
+          <TabsTrigger value="timeline">Timeline View</TabsTrigger>
         </TabsList>
         <TabsContent value="table">
           <ProjectsTable projects={projects} users={users} onUpdateProject={onUpdateProject} />
         </TabsContent>
-        <TabsContent value="chart">
-          <ProjectsChart projects={projects} />
+        <TabsContent value="timeline">
+          <ProjectsTimeline projects={projects} />
         </TabsContent>
       </Tabs>
     </div>
