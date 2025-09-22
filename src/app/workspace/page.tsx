@@ -12,6 +12,7 @@ import {
   PlusCircle,
   BookOpen,
 } from "lucide-react"
+import { format } from "date-fns"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -38,12 +39,25 @@ import {
 import { Icons } from "@/components/icons"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { workspaces } from "@/lib/data"
+import { workspaces as initialWorkspaces } from "@/lib/data"
 import { Badge } from "@/components/ui/badge"
-import { format } from "date-fns"
+import { CreateWorkspaceDialog } from "@/components/workspace/create-workspace-dialog"
+import type { Workspace } from "@/lib/types"
 
 export default function WorkspaceListPage() {
   const [isCollapsed, setIsCollapsed] = React.useState(false)
+  const [workspaces, setWorkspaces] = React.useState<Workspace[]>(initialWorkspaces);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false);
+
+  const handleAddWorkspace = (newWorkspaceData: Omit<Workspace, 'id' | 'mainNote' | 'quickNotes'>) => {
+    const newWorkspace: Workspace = {
+      ...newWorkspaceData,
+      id: `ws-${Date.now()}`,
+      mainNote: '',
+      quickNotes: [],
+    };
+    setWorkspaces(prev => [newWorkspace, ...prev]);
+  };
 
   return (
     <SidebarProvider defaultOpen onOpenChange={(open) => setIsCollapsed(!open)}>
@@ -129,7 +143,7 @@ export default function WorkspaceListPage() {
             <h1 className="font-headline text-xl font-semibold">Workspaces</h1>
           </div>
           <div className="flex items-center gap-2">
-             <Button>
+             <Button onClick={() => setIsCreateDialogOpen(true)}>
               <PlusCircle className="mr-2 h-4 w-4" />
               Add Workspace
             </Button>
@@ -160,6 +174,11 @@ export default function WorkspaceListPage() {
           </div>
         </main>
       </SidebarInset>
+      <CreateWorkspaceDialog
+        isOpen={isCreateDialogOpen}
+        onClose={() => setIsCreateDialogOpen(false)}
+        onAddWorkspace={handleAddWorkspace}
+      />
     </SidebarProvider>
   )
 }
