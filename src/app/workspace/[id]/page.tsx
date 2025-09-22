@@ -49,15 +49,14 @@ import { Badge } from "@/components/ui/badge"
 import { NoteDialog } from "@/components/workspace/note-dialog"
 
 export default function WorkspaceDetailPage({ params }: { params: { id: string } }) {
-  const id = params.id;
   const [isCollapsed, setIsCollapsed] = React.useState(false)
   const [workspace, setWorkspace] = React.useState<Workspace | null>(null);
   const [selectedNote, setSelectedNote] = React.useState<QuickNote | null>(null)
 
   React.useEffect(() => {
-    const foundWorkspace = workspaces.find(ws => ws.id === id);
+    const foundWorkspace = workspaces.find(ws => ws.id === params.id);
     setWorkspace(foundWorkspace || null);
-  }, [id]);
+  }, [params.id]);
 
   if (!workspace) {
     return (
