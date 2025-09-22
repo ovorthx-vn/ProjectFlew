@@ -166,7 +166,7 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                             {project.tasksWithDates.map((task, taskIndex) => {
                                 const taskLeft = differenceInCalendarDays(task.startDate!, startDate) * dayWidth;
                                 const taskWidth = (differenceInCalendarDays(task.dueDate!, task.startDate!) + 1) * dayWidth
-                                const taskTop = 40 + taskIndex * 32;
+                                const taskTop = 40 + (taskIndex * 32);
 
                                 return (
                                     <React.Fragment key={task.id}>
