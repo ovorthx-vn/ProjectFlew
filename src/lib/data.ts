@@ -110,7 +110,7 @@ export const workspaces: Workspace[] = [
       { id: 'qn-1-2', title: 'Punic Wars Summary', content: 'Series of three wars fought between Rome and Carthage.' },
       { id: 'qn-1-3', title: 'Fall of the Republic', content: 'Internal turmoil, civil wars, and the rise of Julius Caesar.' },
     ],
-    youtubeUrl: 'https://www.youtube.com/watch?v=videoseries?list=PL1pcp2D0gE1a0W7sCg0h3-V-g3-vj3sAb',
+    youtubeUrl: 'https://www.youtube.com/watch?v=lP5zbQEdAIk&list=RDlP5zbQEdAIk&start_radio=1',
   },
   {
     id: 'ws-2',
@@ -122,6 +122,6 @@ export const workspaces: Workspace[] = [
       { id: 'qn-2-1', title: 'Schrödinger Equation', content: 'Describes how the quantum state of a quantum system changes with time.' },
       { id: 'qn-2-2', title: 'Heisenberg Uncertainty', content: 'A fundamental limit to the precision with which certain pairs of physical properties can be known.' },
     ],
-    youtubeUrl: 'https://www.youtube.com/watch?v=I-D3kXgGq8c',
+    youtubeUrl: 'https://www.youtube.com/watch?v=lP5zbQEdAIk&list=RDlP5zbQEdAIk&start_radio=1',
   },
 ];
