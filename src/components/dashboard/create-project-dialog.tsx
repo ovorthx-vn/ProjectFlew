@@ -149,7 +149,7 @@ export function CreateProjectDialog({
                     <FormItem>
                         <FormLabel>Assign Members</FormLabel>
                         <div className="space-y-2 rounded-md border p-4 max-h-48 overflow-y-auto">
-                            {users.map((item) => (
+                            {users && users.map((item) => (
                                 <FormField
                                     key={item.id}
                                     control={form.control}
