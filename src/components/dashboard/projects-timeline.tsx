@@ -1,9 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { format, differenceInDays, startOfMonth, endOfMonth, addMonths, eachMonthOfInterval, getYear, differenceInCalendarDays, eachDayOfInterval } from "date-fns"
+import Image from "next/image"
+import { format, differenceInCalendarDays, eachDayOfInterval, startOfMonth, endOfMonth, addMonths, eachMonthOfInterval, getYear } from "date-fns"
 
-import type { Project, Task } from "@/lib/types"
+import type { Project, Task, User } from "@/lib/types"
 import {
   Card,
   CardContent,
@@ -18,6 +19,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 
 interface ProjectsTimelineProps {
   projects: Project[]
@@ -37,51 +39,124 @@ const taskPriorityColorClass: Record<Task['priority'], string> = {
     'Urgent': 'bg-red-400',
 }
 
+interface ItemLayout {
+  id: string
+  level: number
+  top: number
+  startDate: Date
+  dueDate: Date
+}
+
+// Function to calculate the vertical layout of tasks to avoid overlaps
+function calculateLayout(tasks: Task[]): Map<string, ItemLayout> {
+  const layout = new Map<string, ItemLayout>();
+  const levels: Date[] = []; // Stores the end date of the last task in each level
+
+  const sortedTasks = tasks
+    .filter(t => t.startDate && t.dueDate)
+    .sort((a, b) => a.startDate!.getTime() - b.startDate!.getTime());
+
+  sortedTasks.forEach(task => {
+    let assignedLevel = -1;
+
+    // Find the first level where this task can fit
+    for (let i = 0; i < levels.length; i++) {
+      if (task.startDate! > levels[i]) {
+        assignedLevel = i;
+        break;
+      }
+    }
+
+    // If no level found, create a new one
+    if (assignedLevel === -1) {
+      assignedLevel = levels.length;
+    }
+
+    // Update the level's end date
+    levels[assignedLevel] = task.dueDate!;
+    
+    layout.set(task.id, {
+      id: task.id,
+      level: assignedLevel,
+      top: assignedLevel * 40, // 40px per level (32px for bar + 8px margin)
+      startDate: task.startDate!,
+      dueDate: task.dueDate!,
+    });
+  });
+  
+  return layout;
+}
+
 
 export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = React.useState(0);
 
-  const { months, totalDays, startDate, endDate, projectLayouts } = React.useMemo(() => {
+  const { months, totalDays, startDate, endDate, projectLayouts, totalHeight } = React.useMemo(() => {
     if (projects.length === 0) {
-      const now = new Date()
-      const start = startOfMonth(now)
-      const end = endOfMonth(addMonths(now, 2))
+      const now = new Date();
+      const start = startOfMonth(now);
+      const end = endOfMonth(addMonths(now, 2));
       return {
         months: eachMonthOfInterval({ start, end }),
         totalDays: differenceInCalendarDays(end, start) + 1,
         startDate: start,
         endDate: end,
         projectLayouts: [],
-      }
+        totalHeight: 100,
+      };
     }
 
     const allDates = projects.flatMap(p => [
         p.startDate, p.dueDate, 
         ...p.tasks.map(t => t.startDate).filter(Boolean) as Date[],
         ...p.tasks.map(t => t.dueDate).filter(Boolean) as Date[]
-    ])
-    const minDate = new Date(Math.min(...allDates.map(d => d.getTime())))
-    const maxDate = new Date(Math.max(...allDates.map(d => d.getTime())))
+    ]);
     
-    const start = startOfMonth(minDate)
-    const end = endOfMonth(addMonths(maxDate, 1))
+    if (allDates.length === 0) {
+      const now = new Date();
+      const start = startOfMonth(now);
+      const end = endOfMonth(addMonths(now, 2));
+      return {
+        months: eachMonthOfInterval({ start, end }),
+        totalDays: differenceInCalendarDays(end, start) + 1,
+        startDate: start,
+        endDate: end,
+        projectLayouts: [],
+        totalHeight: 100,
+      };
+    }
+
+    const minDate = new Date(Math.min(...allDates.map(d => d.getTime())));
+    const maxDate = new Date(Math.max(...allDates.map(d => d.getTime())));
     
-    const months = eachMonthOfInterval({ start, end })
-    const totalDays = differenceInCalendarDays(end, start) + 1
+    const start = startOfMonth(minDate);
+    const end = endOfMonth(maxDate);
+    
+    const months = eachMonthOfInterval({ start, end });
+    const totalDays = differenceInCalendarDays(end, start) + 1;
     
     let currentTop = 0;
     const projectLayouts = projects.map(project => {
-        const top = currentTop;
-        const tasksWithDates = project.tasks.filter(t => t.startDate && t.dueDate);
-        const height = 40 + (tasksWithDates.length * 32);
-        currentTop += height + 20; // 20 for margin
-        return { ...project, top, height, tasksWithDates };
+        const taskLayout = calculateLayout(project.tasks);
+        const maxLevel = Math.max(-1, ...Array.from(taskLayout.values()).map(l => l.level));
+        const projectHeight = 40 + (maxLevel + 1) * 40;
+
+        const layout = { 
+            ...project, 
+            top: currentTop, 
+            height: projectHeight, 
+            taskLayout 
+        };
+        currentTop += projectHeight + 20; // 20px margin between projects
+        return layout;
     });
 
-    return { months, totalDays, startDate: start, endDate: end, projectLayouts }
-  }, [projects])
+    const totalHeight = currentTop;
 
+    return { months, totalDays, startDate: start, endDate: end, projectLayouts, totalHeight };
+  }, [projects]);
+  
   React.useEffect(() => {
     if (containerRef.current) {
       const observer = new ResizeObserver(entries => {
@@ -93,31 +168,35 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
       return () => observer.disconnect();
     }
   }, []);
-
+  
   const dayWidth = containerWidth > 0 ? containerWidth / totalDays : 0;
-  const totalHeight = projectLayouts.reduce((acc, p) => acc + p.height + 20, 40);
+  
+  const getPosition = (date: Date) => {
+    return differenceInCalendarDays(date, startDate) * dayWidth;
+  }
+  
+  const getWidth = (start: Date, end: Date) => {
+     return (differenceInCalendarDays(end, start) + 1) * dayWidth;
+  }
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Project Timeline</CardTitle>
         <CardDescription>
-          A timeline of all projects from start to due date, including tasks.
+          A Gantt-style overview of your projects and their tasks.
         </CardDescription>
       </CardHeader>
       <CardContent className="p-6 pt-2 overflow-x-auto">
-        <div ref={containerRef} className="w-full min-w-[800px]">
+        <div ref={containerRef} className="w-full min-w-[1200px]">
             {containerWidth > 0 && (
                 <TooltipProvider>
                 <div className="relative" style={{ height: `${totalHeight}px` }}>
-                    {/* Months Header */}
-                    <div className="sticky top-0 z-10 flex bg-background mb-2 h-10 items-end">
-                        {months.map((month, i) => {
-                            const monthStart = startOfMonth(month);
-                            const monthEnd = endOfMonth(month);
-                            const daysInMonth = differenceInCalendarDays(monthEnd, monthStart) + 1;
-                            const isFirstMonth = i === 0;
-                            const displayYear = isFirstMonth || getYear(month) !== getYear(months[i - 1]);
+                    {/* Months Header & Grid Lines */}
+                    <div className="sticky top-0 z-10 flex bg-background/80 backdrop-blur-sm h-10 items-end">
+                        {months.map((month) => {
+                            const daysInMonth = differenceInCalendarDays(endOfMonth(month), startOfMonth(month)) + 1;
+                            const displayYear = getYear(month) !== getYear(addMonths(month, -1));
                             return (
                                 <div 
                                     key={month.toString()} 
@@ -129,15 +208,35 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                             );
                         })}
                     </div>
+                    {/* Day grid lines */}
+                    <div className="absolute top-10 left-0 w-full h-full">
+                       {Array.from({ length: totalDays }).map((_, i) => (
+                          <div
+                            key={i}
+                            className="absolute top-0 h-full border-r border-border/50"
+                            style={{ left: `${(i + 1) * dayWidth}px` }}
+                          />
+                        ))}
+                    </div>
+
+                    {/* Today marker */}
+                    <div className="absolute top-0 h-full" style={{ left: `${getPosition(new Date())}px`}}>
+                      <div className="w-px h-full bg-primary" />
+                      <div className="absolute -top-1 -translate-x-1/2">
+                          <div className="bg-primary text-primary-foreground text-xs font-bold px-2 py-0.5 rounded-full">
+                            Today
+                          </div>
+                      </div>
+                    </div>
 
                     {/* Projects and Tasks */}
                     <div className="relative">
                     {projectLayouts.map((project) => {
-                        const projectLeft = differenceInCalendarDays(project.startDate, startDate) * dayWidth
-                        const projectWidth = (differenceInCalendarDays(project.dueDate, project.startDate) + 1) * dayWidth
+                        const projectLeft = getPosition(project.startDate);
+                        const projectWidth = getWidth(project.startDate, project.dueDate);
                         
                         return (
-                        <div key={project.id} style={{ top: `${project.top}px`}} className="absolute w-full">
+                        <div key={project.id} style={{ top: `${project.top}px`}} className="absolute w-full group">
                             {/* Project Bar */}
                             <Tooltip delayDuration={100}>
                                 <TooltipTrigger asChild>
@@ -146,12 +245,12 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                                     style={{
                                         left: `${projectLeft}px`,
                                         width: `${Math.max(projectWidth, 0)}px`,
-                                        backgroundColor: `hsl(var(--primary) / 0.2)`,
-                                        border: `1px solid hsl(var(--primary))`
+                                        backgroundColor: `hsl(var(--primary) / 0.1)`,
+                                        border: `1px solid hsl(var(--primary) / 0.5)`
                                     }}
                                 >
                                     <div className={cn("absolute left-0 top-0 h-full w-1 rounded-l-lg", priorityColorClass[project.priority])} />
-                                    <span className="text-xs font-medium text-foreground truncate pl-2">{project.name}</span>
+                                    <span className="text-sm font-bold text-primary truncate pl-2">{project.name}</span>
                                 </div>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -162,58 +261,77 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                                 </TooltipContent>
                             </Tooltip>
 
+                             {/* Dependency Lines */}
+                             {project.tasks.map(task => {
+                                const taskLayout = project.taskLayout.get(task.id);
+                                if (!taskLayout) return null;
+                                
+                                return (task.dependencies || []).map(depId => {
+                                  const depLayout = project.taskLayout.get(depId);
+                                  if (!depLayout) return null;
+                                  
+                                  const fromX = getPosition(depLayout.dueDate) + getWidth(depLayout.startDate, depLayout.dueDate);
+                                  const fromY = project.top + 40 + depLayout.top + 14;
+                                  const toX = getPosition(taskLayout.startDate);
+                                  const toY = project.top + 40 + taskLayout.top + 14;
+                                  const midX = fromX + 15;
+
+                                  return (
+                                    <svg key={`${task.id}-${depId}`} className="absolute" style={{ top: 0, left: 0, width: '100%', height: project.height, pointerEvents: 'none' }}>
+                                      <path 
+                                        d={`M ${fromX} ${fromY} L ${midX} ${fromY} L ${midX} ${toY} L ${toX} ${toY}`} 
+                                        stroke="hsl(var(--border))" 
+                                        strokeWidth="1.5" 
+                                        fill="none" 
+                                      />
+                                      {/* Arrowhead */}
+                                      <path d={`M ${toX - 5} ${toY - 4} L ${toX} ${toY} L ${toX - 5} ${toY + 4}`} stroke="hsl(var(--border))" strokeWidth="1.5" fill="none" />
+                                    </svg>
+                                  );
+                                });
+                             })}
+
                             {/* Tasks */}
-                            {project.tasksWithDates.map((task, taskIndex) => {
-                                const taskLeft = differenceInCalendarDays(task.startDate!, startDate) * dayWidth;
-                                const taskWidth = (differenceInCalendarDays(task.dueDate!, task.startDate!) + 1) * dayWidth
-                                const taskTop = 40 + (taskIndex * 32);
-
+                            {Array.from(project.taskLayout.values()).map((taskLayout) => {
+                                const task = project.tasks.find(t => t.id === taskLayout.id)!;
+                                const taskLeft = getPosition(taskLayout.startDate);
+                                const taskWidth = getWidth(taskLayout.startDate, taskLayout.dueDate);
+                                
                                 return (
-                                    <React.Fragment key={task.id}>
-                                         {/* Connecting lines */}
-                                        <div 
-                                            className="absolute bg-border" 
-                                            style={{
-                                                left: `${projectLeft + 10}px`,
-                                                top: '28px',
-                                                width: '1px',
-                                                height: `${taskTop - 28 + 12}`,
-                                            }}
-                                        />
-                                         <div 
-                                            className="absolute bg-border" 
-                                            style={{
-                                                left: `${projectLeft + 10}px`,
-                                                top: `${taskTop + 12}px`,
-                                                width: `${taskLeft - (projectLeft + 10)}px`,
-                                                height: '1px',
-                                            }}
-                                        />
-
-                                        <Tooltip delayDuration={100}>
-                                            <TooltipTrigger asChild>
-                                                <div
-                                                    className="absolute h-6 rounded-md flex items-center px-2 cursor-pointer"
-                                                    style={{
-                                                        top: `${taskTop}px`,
-                                                        left: `${taskLeft}px`,
-                                                        width: `${Math.max(taskWidth, 2)}px`, // min width
-                                                        backgroundColor: `hsl(var(--secondary))`
-                                                    }}
-                                                >
-                                                    <div className={cn("absolute left-0 top-0 h-full w-1 rounded-l-md", taskPriorityColorClass[task.priority])} />
-                                                    <span className="text-xs text-muted-foreground truncate pl-1">{task.title}</span>
+                                    <Tooltip key={task.id} delayDuration={100}>
+                                        <TooltipTrigger asChild>
+                                            <div
+                                                className="absolute h-7 rounded-md flex items-center cursor-pointer group/task"
+                                                style={{
+                                                    top: `${40 + taskLayout.top}px`,
+                                                    left: `${taskLeft}px`,
+                                                    width: `${Math.max(taskWidth, 2)}px`, // min width
+                                                    backgroundColor: `hsl(var(--secondary))`
+                                                }}
+                                            >
+                                                <div className={cn("absolute left-0 top-0 h-full w-1 rounded-l-md", taskPriorityColorClass[task.priority])} />
+                                                <span className="text-xs text-secondary-foreground font-medium truncate absolute left-full ml-9 w-40">
+                                                  {task.title}
+                                                </span>
+                                                <div className="absolute left-full ml-2 flex items-center">
+                                                  {task.assigned.map(user => (
+                                                    <Avatar key={user.id} className="h-5 w-5 -ml-1 border-2 border-background">
+                                                      <AvatarImage src={user.avatar} alt={user.name}/>
+                                                      <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                                                    </Avatar>
+                                                  ))}
                                                 </div>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p className="font-bold">{task.title}</p>
-                                                <p>Start: {format(task.startDate!, "MMM d, yyyy")}</p>
-                                                <p>Due: {format(task.dueDate!, "MMM d, yyyy")}</p>
-                                                <p>Status: {task.status}</p>
-                                                <p>Priority: {task.priority}</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </React.Fragment>
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p className="font-bold">{task.title}</p>
+                                            <p>Start: {format(task.startDate!, "MMM d, yyyy")}</p>
+                                            <p>Due: {format(task.dueDate!, "MMM d, yyyy")}</p>
+                                            <p>Status: {task.status}</p>
+                                            <p>Priority: {task.priority}</p>
+                                            {task.assigned.length > 0 && <p>Assigned: {task.assigned.map(u=>u.name).join(', ')}</p>}
+                                        </TooltipContent>
+                                    </Tooltip>
                                 )
                             })}
                         </div>
@@ -222,6 +340,11 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                     </div>
                 </div>
                 </TooltipProvider>
+            )}
+             {!containerWidth && (
+              <div className="flex justify-center items-center h-48 text-muted-foreground">
+                Loading timeline...
+              </div>
             )}
         </div>
       </CardContent>

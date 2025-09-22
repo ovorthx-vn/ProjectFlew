@@ -17,10 +17,11 @@ export type Task = {
   startDate?: Date;
   dueDate?: Date;
   priority: Priority;
+  dependencies?: string[];
 };
 
 export type Project = {
-  id: string;
+  id:string;
   name: string;
   startDate: Date;
   dueDate: Date;

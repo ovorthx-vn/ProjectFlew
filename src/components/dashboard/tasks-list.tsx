@@ -1,6 +1,6 @@
 "use client"
 import * as React from "react"
-import { Plus, UserPlus, Calendar as CalendarIcon } from "lucide-react"
+import { Plus, UserPlus, Calendar as CalendarIcon, Link2 } from "lucide-react"
 import Image from "next/image"
 import { format } from "date-fns"
 
@@ -34,6 +34,8 @@ import { NotesPopover } from "./notes-popover"
 import { useToast } from "@/hooks/use-toast"
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 import { Calendar } from "../ui/calendar"
+import { Checkbox } from "../ui/checkbox"
+import { Label } from "../ui/label"
 
 interface TasksListProps {
   tasks: Task[]
@@ -65,6 +67,7 @@ export function TasksList({ tasks, projectUsers, onTasksUpdate }: TasksListProps
       status: 'To-Do',
       priority: 'Medium',
       assigned: [],
+      dependencies: [],
     }
     onTasksUpdate([...tasks, newTask])
     setNewTaskTitle("")
@@ -109,7 +112,7 @@ export function TasksList({ tasks, projectUsers, onTasksUpdate }: TasksListProps
                 <TableHead className="w-[150px]">Start Date</TableHead>
                 <TableHead className="w-[150px]">Due Date</TableHead>
                 <TableHead>Assigned</TableHead>
-                <TableHead className="w-[100px] text-right">Actions</TableHead>
+                <TableHead className="w-[130px] text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -227,7 +230,40 @@ export function TasksList({ tasks, projectUsers, onTasksUpdate }: TasksListProps
                       </Button>
                     </div>
                   </TableCell>
-                   <TableCell className="text-right">
+                   <TableCell className="text-right space-x-1">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Link2 className="h-4 w-4" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent>
+                        <div className="space-y-2">
+                            <h4 className="font-medium">Dependencies</h4>
+                            <p className="text-sm text-muted-foreground">Select tasks that must be completed before this one.</p>
+                            <div className="space-y-2">
+                                {tasks.filter(t => t.id !== task.id).map(dependencyTask => (
+                                    <div key={dependencyTask.id} className="flex items-center space-x-2">
+                                        <Checkbox
+                                            id={`dep-${task.id}-${dependencyTask.id}`}
+                                            checked={(task.dependencies || []).includes(dependencyTask.id)}
+                                            onCheckedChange={(checked) => {
+                                                const currentDeps = task.dependencies || [];
+                                                const newDeps = checked
+                                                    ? [...currentDeps, dependencyTask.id]
+                                                    : currentDeps.filter(id => id !== dependencyTask.id);
+                                                handleUpdateTask(task.id, { dependencies: newDeps });
+                                            }}
+                                        />
+                                        <Label htmlFor={`dep-${task.id}-${dependencyTask.id}`} className="font-normal text-sm">
+                                            {dependencyTask.title}
+                                        </Label>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                     <NotesPopover 
                         title={`Notes for ${task.title}`} 
                         notes={task.notes} 
