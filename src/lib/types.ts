@@ -15,6 +15,7 @@ export type Task = {
   assigned: User[];
   notes?: string;
   dueDate?: Date;
+  priority: Priority;
 };
 
 export type Project = {

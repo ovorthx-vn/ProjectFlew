@@ -43,6 +43,7 @@ interface TasksListProps {
 }
 
 const statusOptions: Task['status'][] = ['To-Do', 'In Progress', 'Done', 'Backlog'];
+const priorityOptions: Priority[] = ['Low', 'Medium', 'High', 'Urgent'];
 
 export function TasksList({ tasks, projectUsers, onTasksUpdate }: TasksListProps) {
   const { toast } = useToast()
@@ -62,6 +63,7 @@ export function TasksList({ tasks, projectUsers, onTasksUpdate }: TasksListProps
       id: `task-${Date.now()}`,
       title: newTaskTitle,
       status: 'To-Do',
+      priority: 'Medium',
       assigned: [],
     }
     onTasksUpdate([...tasks, newTask])
@@ -105,6 +107,7 @@ export function TasksList({ tasks, projectUsers, onTasksUpdate }: TasksListProps
               <TableRow>
                 <TableHead>Title</TableHead>
                 <TableHead className="w-[150px]">Status</TableHead>
+                <TableHead className="w-[150px]">Priority</TableHead>
                 <TableHead className="w-[150px]">Due Date</TableHead>
                 <TableHead>Assigned</TableHead>
                 <TableHead className="w-[100px] text-right">Actions</TableHead>
@@ -124,6 +127,23 @@ export function TasksList({ tasks, projectUsers, onTasksUpdate }: TasksListProps
                       </SelectTrigger>
                       <SelectContent>
                         {statusOptions.map(option => (
+                          <SelectItem key={option} value={option}>
+                            {option}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  <TableCell>
+                     <Select
+                      value={task.priority}
+                      onValueChange={(value: Priority) => handleUpdateTask(task.id, { priority: value })}
+                    >
+                      <SelectTrigger className="h-8">
+                        <SelectValue placeholder="Set priority" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {priorityOptions.map(option => (
                           <SelectItem key={option} value={option}>
                             {option}
                           </SelectItem>
