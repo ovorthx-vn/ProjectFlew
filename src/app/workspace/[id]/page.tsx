@@ -68,7 +68,7 @@ export default function WorkspaceDetailPage({ params }: { params: { id: string }
     if (foundWorkspace) {
       setMainNote(foundWorkspace.mainNote);
     }
-  }, [params.id, workspaces]);
+  }, [params, workspaces]);
 
   const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMainNote(e.target.value);
