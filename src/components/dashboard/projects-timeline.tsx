@@ -107,7 +107,7 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                 <TooltipProvider>
                 <div className="relative" style={{ width: `${containerWidth}px`, height: `${totalHeight}px` }}>
                     {/* Months Header */}
-                    <div className="sticky top-0 z-10 flex bg-background/80 backdrop-blur-sm h-10 items-end border-b">
+                    <div className="sticky top-0 z-10 flex bg-background/80 backdrop-blur-sm h-10 items-center border-b">
                         {months.map((month, index) => {
                             const daysInMonth = differenceInCalendarDays(endOfMonth(month), startOfMonth(month)) + 1;
                             const monthWidth = daysInMonth * dayWidth;
@@ -135,7 +135,7 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                     </div>
 
                     {/* Projects */}
-                    <div className="relative pt-12">
+                    <div className="relative pt-8">
                     {projects.map((project, index) => {
                         const projectLeft = getPosition(project.startDate);
                         const projectWidth = getWidth(project.startDate, project.dueDate);
