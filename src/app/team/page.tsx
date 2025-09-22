@@ -46,7 +46,7 @@ import { CreateMemberDialog } from "@/components/settings/create-member-dialog"
 
 interface TeamPageProps {
   users: User[];
-  addUser: (user: Omit<User, 'id'>) => void;
+  addUser: (user: Omit<User, 'id' | 'avatar'>) => void;
   updateUser: (user: User) => void;
 }
 
@@ -173,7 +173,7 @@ export default function TeamPage({ users, addUser, updateUser }: TeamPageProps) 
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {users.map((user) => (
+                    {users && users.map((user) => (
                       <TableRow key={user.id}>
                         <TableCell>
                           <div className="flex items-center gap-2">

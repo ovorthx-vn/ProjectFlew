@@ -167,7 +167,7 @@ export default function SettingsPage({ users, addUser }: SettingsPageProps) {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {users.map((user) => (
+                    {users && users.map((user) => (
                       <TableRow key={user.id}>
                         <TableCell>
                           <div className="flex items-center gap-2">
