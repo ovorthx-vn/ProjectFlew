@@ -299,105 +299,107 @@ function WorkspaceDetail({ id }: { id: string }) {
             <ThemeToggle />
           </div>
         </header>
-        <main className="flex-1 p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-60px)]">
-            <ScrollArea className="h-full">
-                <div className="lg:col-span-1 space-y-6 pr-4">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between">
-                            <div>
-                                <CardTitle className="flex items-center gap-2"><Youtube /> YouTube</CardTitle>
-                                <CardDescription>Your study video/playlist.</CardDescription>
-                            </div>
-                             <Button variant="ghost" size="icon" onClick={() => setIsYouTubeLinkDialogOpen(true)}>
-                                <Pencil className="h-4 w-4" />
-                            </Button>
-                        </CardHeader>
-                        <CardContent>
-                             <iframe 
-                                className="w-full aspect-video rounded-lg"
-                                src={getYouTubeEmbedUrl(workspace.youtubeUrl)}
-                                title="YouTube video player"
-                                frameBorder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                                allowFullScreen>
-                            </iframe>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2"><StickyNote /> Quick Notes</CardTitle>
-                            <CardDescription>Click to view a note.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <ul className="space-y-2">
-                            {workspace.quickNotes.map(note => (
-                                <li key={note.id} className="flex items-center gap-2">
-                                <Button variant="outline" className="w-full justify-start" onClick={() => setSelectedNote(note)}>
-                                    {note.title}
+        <main className="flex flex-1 h-[calc(100vh-60px)] overflow-hidden">
+            <div className="w-full lg:w-[400px] flex-shrink-0">
+                <ScrollArea className="h-full p-4 sm:p-6">
+                    <div className="space-y-6">
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between">
+                                <div>
+                                    <CardTitle className="flex items-center gap-2"><Youtube /> YouTube</CardTitle>
+                                    <CardDescription>Your study video/playlist.</CardDescription>
+                                </div>
+                                <Button variant="ghost" size="icon" onClick={() => setIsYouTubeLinkDialogOpen(true)}>
+                                    <Pencil className="h-4 w-4" />
                                 </Button>
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
-                                      <MoreHorizontal className="h-4 w-4" />
+                            </CardHeader>
+                            <CardContent>
+                                <iframe 
+                                    className="w-full aspect-video rounded-lg"
+                                    src={getYouTubeEmbedUrl(workspace.youtubeUrl)}
+                                    title="YouTube video player"
+                                    frameBorder="0" 
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                    allowFullScreen>
+                                </iframe>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2"><StickyNote /> Quick Notes</CardTitle>
+                                <CardDescription>Click to view a note.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <ul className="space-y-2">
+                                {workspace.quickNotes.map(note => (
+                                    <li key={note.id} className="flex items-center gap-2">
+                                    <Button variant="outline" className="w-full justify-start" onClick={() => setSelectedNote(note)}>
+                                        {note.title}
                                     </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent>
-                                    <DropdownMenuItem onClick={() => setEditingNote(note)}>Edit</DropdownMenuItem>
-                                    <DropdownMenuItem className="text-destructive" onClick={() => setItemToDelete({type: 'note', id: note.id})}>Delete</DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                                </li>
-                            ))}
-                            </ul>
-                        </CardContent>
-                    </Card>
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between">
-                            <div>
-                                <CardTitle className="flex items-center gap-2"><LinkIcon /> Documents</CardTitle>
-                                <CardDescription>Relevant links and documents.</CardDescription>
-                            </div>
-                            <Button variant="outline" size="sm" onClick={() => setIsAddDocumentLinkDialogOpen(true)}>
-                                <PlusCircle className="mr-2 h-4 w-4" />
-                                Add
-                            </Button>
-                        </CardHeader>
-                        <CardContent>
-                            <ul className="space-y-2">
-                            {(workspace.documentLinks || []).map(link => (
-                                <li key={link.id} className="flex items-center gap-2">
-                                <Button variant="outline" className="w-full justify-start" asChild>
-                                    <Link href={link.url} target="_blank" className="truncate">
-                                        {link.title}
-                                    </Link>
+                                    <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
+                                        <MoreHorizontal className="h-4 w-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                        <DropdownMenuItem onClick={() => setEditingNote(note)}>Edit</DropdownMenuItem>
+                                        <DropdownMenuItem className="text-destructive" onClick={() => setItemToDelete({type: 'note', id: note.id})}>Delete</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                    </DropdownMenu>
+                                    </li>
+                                ))}
+                                </ul>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between">
+                                <div>
+                                    <CardTitle className="flex items-center gap-2"><LinkIcon /> Documents</CardTitle>
+                                    <CardDescription>Relevant links and documents.</CardDescription>
+                                </div>
+                                <Button variant="outline" size="sm" onClick={() => setIsAddDocumentLinkDialogOpen(true)}>
+                                    <PlusCircle className="mr-2 h-4 w-4" />
+                                    Add
                                 </Button>
-                                 <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
-                                      <MoreHorizontal className="h-4 w-4" />
+                            </CardHeader>
+                            <CardContent>
+                                <ul className="space-y-2">
+                                {(workspace.documentLinks || []).map(link => (
+                                    <li key={link.id} className="flex items-center gap-2">
+                                    <Button variant="outline" className="w-full justify-start" asChild>
+                                        <Link href={link.url} target="_blank" className="truncate">
+                                            {link.title}
+                                        </Link>
                                     </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent>
-                                    <DropdownMenuItem onClick={() => setEditingLink(link)}>Edit</DropdownMenuItem>
-                                    <DropdownMenuItem className="text-destructive" onClick={() => setItemToDelete({type: 'link', id: link.id})}>Delete</DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                                </li>
-                            ))}
-                            </ul>
-                        </CardContent>
-                    </Card>
-                </div>
-            </ScrollArea>
-            <div className="lg:col-span-2">
+                                    <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
+                                        <MoreHorizontal className="h-4 w-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                        <DropdownMenuItem onClick={() => setEditingLink(link)}>Edit</DropdownMenuItem>
+                                        <DropdownMenuItem className="text-destructive" onClick={() => setItemToDelete({type: 'link', id: link.id})}>Delete</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                    </DropdownMenu>
+                                    </li>
+                                ))}
+                                </ul>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </ScrollArea>
+            </div>
+            <div className="flex-1 p-4 sm:p-6 lg:pl-0">
                 <Card className="h-full flex flex-col">
                     <CardHeader>
                         <CardTitle>Notes</CardTitle>
                         <CardDescription>Your main area for taking notes for {workspace.subject}. Changes are saved automatically.</CardDescription>
                     </CardHeader>
-                    <CardContent className="flex-grow flex flex-col">
+                    <CardContent className="flex-grow">
                         <Textarea 
-                            className="h-full flex-grow" 
+                            className="h-full resize-none" 
                             placeholder="Start typing your notes here..." 
                             value={mainNote}
                             onChange={handleNoteChange}
