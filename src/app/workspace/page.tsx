@@ -143,8 +143,8 @@ export default function WorkspaceListPage() {
         <main className="flex-1 p-4 sm:p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {workspaces.map(ws => (
-              <Link href={`/workspace/${ws.id}`} key={ws.id}>
-                <Card className="hover:shadow-lg transition-shadow h-full flex flex-col">
+              <Card key={ws.id} className="hover:shadow-lg transition-shadow h-full flex flex-col">
+                <Link href={`/workspace/${ws.id}`} className="flex flex-col flex-grow">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <BookOpen className="text-primary" />
@@ -158,8 +158,8 @@ export default function WorkspaceListPage() {
                       <Badge variant="outline">{format(ws.dueDate, "PPP")}</Badge>
                     </div>
                   </CardContent>
-                </Card>
-              </Link>
+                </Link>
+              </Card>
             ))}
           </div>
         </main>
