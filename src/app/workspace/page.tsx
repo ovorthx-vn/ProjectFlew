@@ -4,13 +4,12 @@ import * as React from "react"
 import Image from "next/image"
 import {
   Archive,
-  Briefcase,
   LayoutGrid,
+  Briefcase,
   User as UserIcon,
   Users as UsersIcon,
 } from "lucide-react"
 
-import type { Project, User } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -36,14 +35,9 @@ import {
 import { Icons } from "@/components/icons"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { ArchivedProjectsTable } from "@/components/archive/archived-projects-table"
-import { useProject } from "@/context/project-context"
 
-export default function ArchivePage() {
-  const { projects } = useProject();
+export default function WorkspacePage() {
   const [isCollapsed, setIsCollapsed] = React.useState(false)
-
-  const archivedProjects = projects.filter(p => p.progress >= 100);
 
   return (
     <SidebarProvider defaultOpen onOpenChange={(open) => setIsCollapsed(!open)}>
@@ -67,7 +61,7 @@ export default function ArchivePage() {
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton href="/workspace">
+              <SidebarMenuButton href="/workspace" isActive>
                 <Briefcase />
                 Workspace
               </SidebarMenuButton>
@@ -79,7 +73,7 @@ export default function ArchivePage() {
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton href="/archive" isActive>
+              <SidebarMenuButton href="/archive">
                 <Archive />
                 Archive
               </SidebarMenuButton>
@@ -126,7 +120,7 @@ export default function ArchivePage() {
         <header className="flex h-14 items-center gap-4 border-b bg-background/95 backdrop-blur-sm px-4 lg:h-[60px] lg:px-6 sticky top-0 z-10">
           <SidebarTrigger className="md:hidden" />
           <div className="flex-1">
-            <h1 className="font-headline text-xl font-semibold">Archive</h1>
+            <h1 className="font-headline text-xl font-semibold">Workspace</h1>
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
@@ -135,11 +129,12 @@ export default function ArchivePage() {
         <main className="flex-1 p-4 sm:p-6">
             <Card>
               <CardHeader>
-                <CardTitle>Archived Projects</CardTitle>
-                <CardDescription>View all your completed projects.</CardDescription>
+                <CardTitle>Workspace</CardTitle>
+                <CardDescription>This is your collaborative workspace.
+</CardDescription>
               </CardHeader>
               <CardContent>
-                <ArchivedProjectsTable projects={archivedProjects} />
+                <p>Content for the workspace will go here.</p>
               </CardContent>
             </Card>
         </main>

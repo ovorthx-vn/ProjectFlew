@@ -5,7 +5,7 @@ import Image from "next/image"
 import {
   Archive,
   LayoutGrid,
-  Settings,
+  Briefcase,
   User as UserIcon,
   Users as UsersIcon,
   MoreHorizontal,
@@ -86,6 +86,12 @@ export default function TeamPage() {
               <SidebarMenuButton href="/">
                 <LayoutGrid />
                 Projects
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton href="/workspace">
+                <Briefcase />
+                Workspace
               </SidebarMenuButton>
             </SidebarMenuItem>
              <SidebarMenuItem>

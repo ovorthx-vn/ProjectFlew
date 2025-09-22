@@ -5,6 +5,7 @@ import Image from "next/image"
 import {
   Archive,
   Bell,
+  Briefcase,
   CalendarDays,
   LayoutGrid,
   Users as UsersIcon,
@@ -124,6 +125,12 @@ export default function DashboardPage() {
               <SidebarMenuButton href="/" isActive>
                 <LayoutGrid />
                 Projects
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton href="/workspace">
+                <Briefcase />
+                Workspace
               </SidebarMenuButton>
             </SidebarMenuItem>
              <SidebarMenuItem>
