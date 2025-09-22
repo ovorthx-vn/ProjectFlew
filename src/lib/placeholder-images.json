@@ -1,3 +1,40 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "user-1",
+      "description": "User avatar for Liam Johnson",
+      "imageUrl": "https://picsum.photos/seed/user1/40/40",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "user-2",
+      "description": "User avatar for Olivia Smith",
+      "imageUrl": "https://picsum.photos/seed/user2/40/40",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "user-3",
+      "description": "User avatar for Noah Williams",
+      "imageUrl": "https://picsum.photos/seed/user3/40/40",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "user-4",
+      "description": "User avatar for Emma Brown",
+      "imageUrl": "https://picsum.photos/seed/user4/40/40",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "user-5",
+      "description": "User avatar for Ava Jones",
+      "imageUrl": "https://picsum.photos/seed/user5/40/40",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "mind-map-1",
+      "description": "Placeholder mind map",
+      "imageUrl": "https://picsum.photos/seed/mindmap1/800/600",
+      "imageHint": "abstract diagram"
+    }
+  ]
 }

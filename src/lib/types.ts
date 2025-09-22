@@ -1,0 +1,27 @@
+export type User = {
+  id: string;
+  name: string;
+  avatar: string;
+  role: string;
+  availability: 'Available' | 'Busy' | 'On Vacation';
+};
+
+export type Task = {
+  id: string;
+  title: string;
+  status: 'To-Do' | 'In Progress' | 'Done' | 'Backlog';
+  assigned: User[];
+  notes?: string;
+};
+
+export type Project = {
+  id: string;
+  name: string;
+  dueDate: Date;
+  progress: number;
+  tasks: Task[];
+  members: User[];
+  notes?: string;
+  mindMapUrl?: string;
+  createdAt: Date;
+};
