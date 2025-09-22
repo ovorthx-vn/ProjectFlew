@@ -6,7 +6,7 @@ import { workspaces as initialWorkspaces } from "@/lib/data"
 
 type WorkspaceContextType = {
   workspaces: Workspace[];
-  addWorkspace: (workspace: Omit<Workspace, 'id' | 'mainNote' | 'quickNotes'>) => void;
+  addWorkspace: (workspace: Omit<Workspace, 'id' | 'mainNote' | 'quickNotes' | 'documentLinks'>) => void;
   updateWorkspace: (workspace: Workspace) => void;
 };
 
@@ -15,7 +15,7 @@ const WorkspaceContext = React.createContext<WorkspaceContextType | undefined>(u
 export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const [workspaces, setWorkspaces] = React.useState<Workspace[]>(initialWorkspaces);
 
-  const addWorkspace = (workspace: Omit<Workspace, 'id' | 'mainNote' | 'quickNotes'>) => {
+  const addWorkspace = (workspace: Omit<Workspace, 'id' | 'mainNote' | 'quickNotes' | 'documentLinks'>) => {
     const newIdSuffix = workspaces.length + 1;
     const newWorkspace: Workspace = {
       ...workspace,
@@ -26,6 +26,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
         { id: `qn-${newIdSuffix}-2`, title: 'Resources', content: '- Book/Chapter\n- Website URL' },
         { id: `qn-${newIdSuffix}-3`, title: 'Action Items', content: '- [ ] Read chapter 5\n- [ ] Review lecture notes' },
       ],
+      documentLinks: [],
       youtubeUrl: 'https://www.youtube.com/watch?v=jfKfPfyJRdk'
     };
     setWorkspaces(prev => [newWorkspace, ...prev]);

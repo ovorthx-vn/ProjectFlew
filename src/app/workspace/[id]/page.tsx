@@ -15,8 +15,10 @@ import {
   StickyNote,
   MoreHorizontal,
   PlusCircle,
-  Pencil
+  Pencil,
+  Link as LinkIcon
 } from "lucide-react"
+import Link from "next/link"
 import { format } from "date-fns"
 
 import { cn } from "@/lib/utils"
@@ -45,12 +47,13 @@ import { Icons } from "@/components/icons"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
-import type { Workspace, QuickNote } from "@/lib/types"
+import type { Workspace, QuickNote, DocumentLink } from "@/lib/types"
 import { NoteDialog } from "@/components/workspace/note-dialog"
 import { useWorkspace } from "@/context/workspace-context"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { SaveNoteDialog } from "@/components/workspace/save-note-dialog"
 import { YouTubeLinkDialog } from "@/components/workspace/youtube-link-dialog"
+import { AddDocumentLinkDialog } from "@/components/workspace/add-document-link-dialog"
 
 function WorkspaceDetail({ id }: { id: string }) {
   const [isCollapsed, setIsCollapsed] = React.useState(false)
@@ -60,6 +63,7 @@ function WorkspaceDetail({ id }: { id: string }) {
   const [mainNote, setMainNote] = React.useState('');
   const [isSaveNoteDialogOpen, setIsSaveNoteDialogOpen] = React.useState(false);
   const [isYouTubeLinkDialogOpen, setIsYouTubeLinkDialogOpen] = React.useState(false);
+  const [isAddDocumentLinkDialogOpen, setIsAddDocumentLinkDialogOpen] = React.useState(false);
 
 
   React.useEffect(() => {
@@ -100,6 +104,21 @@ function WorkspaceDetail({ id }: { id: string }) {
       updateWorkspace({ ...workspace, youtubeUrl: link });
     }
   };
+
+  const handleAddDocumentLink = (title: string, url: string) => {
+    if(workspace) {
+        const newLink: DocumentLink = {
+            id: `doc-${Date.now()}`,
+            title,
+            url
+        }
+        const updatedWorkspace = {
+            ...workspace,
+            documentLinks: [...(workspace.documentLinks || []), newLink]
+        }
+        updateWorkspace(updatedWorkspace);
+    }
+  }
 
  const getYouTubeEmbedUrl = (url: string | undefined): string => {
     if (!url) {
@@ -290,6 +309,41 @@ function WorkspaceDetail({ id }: { id: string }) {
                             </ul>
                         </CardContent>
                     </Card>
+                    <Card>
+                        <CardHeader className="flex flex-row items-center justify-between">
+                            <div>
+                                <CardTitle className="flex items-center gap-2"><LinkIcon /> Documents</CardTitle>
+                                <CardDescription>Relevant links and documents.</CardDescription>
+                            </div>
+                            <Button variant="ghost" size="icon" onClick={() => setIsAddDocumentLinkDialogOpen(true)}>
+                                <PlusCircle className="h-4 w-4" />
+                            </Button>
+                        </CardHeader>
+                        <CardContent>
+                            <ul className="space-y-2">
+                            {(workspace.documentLinks || []).map(link => (
+                                <li key={link.id} className="flex items-center gap-2">
+                                <Button variant="outline" className="w-full justify-start" asChild>
+                                    <Link href={link.url} target="_blank">
+                                        {link.title}
+                                    </Link>
+                                </Button>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
+                                            <MoreHorizontal className="h-4 w-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                        <DropdownMenuItem>Edit</DropdownMenuItem>
+                                        <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                                </li>
+                            ))}
+                            </ul>
+                        </CardContent>
+                    </Card>
                 </div>
             </ScrollArea>
             <div className="lg:col-span-2">
@@ -336,6 +390,11 @@ function WorkspaceDetail({ id }: { id: string }) {
         onSave={handleSaveYouTubeLink}
         currentUrl={workspace.youtubeUrl}
       />
+      <AddDocumentLinkDialog
+        isOpen={isAddDocumentLinkDialogOpen}
+        onClose={() => setIsAddDocumentLinkDialogOpen(false)}
+        onSave={handleAddDocumentLink}
+      />
     </SidebarProvider>
   )
 }
@@ -344,8 +403,9 @@ export default function WorkspaceDetailPage({ params }: { params: { id: string }
   const [id, setId] = React.useState<string>('');
   
   React.useEffect(() => {
-    // This effect runs only on the client, after hydration
-    setId(params.id);
+    if (params) {
+        setId(params.id);
+    }
   }, [params]);
 
   if (!id) {

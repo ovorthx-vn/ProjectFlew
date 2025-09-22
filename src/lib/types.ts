@@ -39,6 +39,12 @@ export type QuickNote = {
   content: string;
 };
 
+export type DocumentLink = {
+  id: string;
+  title: string;
+  url: string;
+};
+
 export type Workspace = {
   id: string;
   subject: string;
@@ -46,5 +52,6 @@ export type Workspace = {
   dueDate: Date;
   mainNote: string;
   quickNotes: QuickNote[];
+  documentLinks?: DocumentLink[];
   youtubeUrl?: string;
 };
