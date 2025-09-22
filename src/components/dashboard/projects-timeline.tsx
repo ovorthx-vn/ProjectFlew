@@ -38,7 +38,7 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
       const end = endOfMonth(addMonths(now, 2))
       return {
         months: eachMonthOfInterval({ start, end }),
-        totalDays: differenceInDays(end, start),
+        totalDays: differenceInDays(end, start) + 1,
         startDate: start,
       }
     }
@@ -48,13 +48,15 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
     const maxDate = new Date(Math.max(...allDates.map(d => d.getTime())))
     
     const start = startOfMonth(minDate)
-    const end = endOfMonth(maxDate)
+    const end = endOfMonth(addMonths(maxDate, 1))
     
     const months = eachMonthOfInterval({ start, end })
-    const totalDays = differenceInDays(end, start)
+    const totalDays = differenceInDays(end, start) + 1
     
     return { months, totalDays, startDate: start }
   }, [projects])
+
+  const dayWidth = 4;
 
   return (
     <Card>
@@ -67,9 +69,9 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
       <CardContent className="p-6">
         <div className="overflow-x-auto">
             <TooltipProvider>
-            <div className="relative" style={{ minWidth: `${totalDays * 3}px` }}>
+            <div className="relative" style={{ minWidth: `${totalDays * dayWidth}px`, height: `${projects.length * 40 + 40}px` }}>
                 {/* Months Header */}
-                <div className="sticky top-0 z-10 flex bg-background mb-2">
+                <div className="sticky top-0 z-10 flex bg-background mb-2 h-10 items-end">
                     {months.map((month, i) => {
                         const daysInMonth = differenceInDays(endOfMonth(month), startOfMonth(month)) + 1;
                         const isFirstMonth = i === 0;
@@ -78,7 +80,7 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                             <div 
                                 key={month.toString()} 
                                 className="text-center text-sm font-semibold border-r"
-                                style={{ width: `${daysInMonth * 3}px` }}
+                                style={{ width: `${daysInMonth * dayWidth}px` }}
                             >
                             {displayYear ? format(month, 'MMM yyyy') : format(month, 'MMM')}
                             </div>
@@ -89,19 +91,21 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                 {/* Projects */}
                 <div className="relative">
                 {projects.map((project, index) => {
-                    const left = differenceInDays(project.createdAt, startDate) * 3
-                    const width = differenceInDays(project.dueDate, project.createdAt) * 3
+                    const left = differenceInDays(project.createdAt, startDate) * dayWidth
+                    const width = (differenceInDays(project.dueDate, project.createdAt) + 1) * dayWidth
+                    const top = index * 40;
                     
                     return (
                     <Tooltip key={project.id} delayDuration={100}>
                         <TooltipTrigger asChild>
                         <div
-                            className="relative h-8 rounded-lg flex items-center px-2 cursor-pointer mb-2"
+                            className="absolute h-8 rounded-lg flex items-center px-2 cursor-pointer"
                             style={{
-                            left: `${left}px`,
-                            width: `${width}px`,
-                            backgroundColor: `hsl(var(--primary) / 0.2)`,
-                            border: `1px solid hsl(var(--primary))`
+                                top: `${top}px`,
+                                left: `${left}px`,
+                                width: `${width}px`,
+                                backgroundColor: `hsl(var(--primary) / 0.2)`,
+                                border: `1px solid hsl(var(--primary))`
                             }}
                         >
                             <div className={cn("absolute left-0 top-0 h-full w-1 rounded-l-lg", priorityColorClass[project.priority])} />
