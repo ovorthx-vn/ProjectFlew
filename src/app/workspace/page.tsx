@@ -38,7 +38,6 @@ import {
 } from "@/components/ui/sidebar"
 import { Icons } from "@/components/icons"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { CreateWorkspaceDialog } from "@/components/workspace/create-workspace-dialog"
 import type { Workspace } from "@/lib/types"
