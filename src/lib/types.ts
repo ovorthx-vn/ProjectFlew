@@ -6,10 +6,13 @@ export type User = {
   availability: 'Available' | 'Busy' | 'On Vacation';
 };
 
+export type Priority = 'Low' | 'Medium' | 'High' | 'Urgent';
+
 export type Task = {
   id: string;
   title: string;
   status: 'To-Do' | 'In Progress' | 'Done' | 'Backlog';
+  priority: Priority;
   assigned: User[];
   notes?: string;
   dueDate?: Date;
@@ -20,6 +23,7 @@ export type Project = {
   name: string;
   dueDate: Date;
   progress: number;
+  priority: Priority;
   tasks: Task[];
   members: User[];
   notes?: string;

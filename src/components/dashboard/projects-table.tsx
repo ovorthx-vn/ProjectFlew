@@ -4,7 +4,8 @@ import Image from "next/image"
 import { format } from "date-fns"
 import { ChevronDown, ChevronRight, FolderKanban, MoreHorizontal, BrainCircuit } from "lucide-react"
 
-import type { Project, User } from "@/lib/types"
+import type { Project, User, Priority } from "@/lib/types"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
@@ -25,11 +26,19 @@ import {
 import { MindMapDialog } from "./mind-map-dialog"
 import { NotesPopover } from "./notes-popover"
 import { TasksList } from "./tasks-list"
+import { Badge } from "../ui/badge"
 
 interface ProjectsTableProps {
   projects: Project[]
   users: User[]
   onUpdateProject: (project: Project) => void
+}
+
+const priorityBadgeVariant: Record<Priority, string> = {
+    'Low': 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300',
+    'Medium': 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300',
+    'High': 'bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300',
+    'Urgent': 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300',
 }
 
 export function ProjectsTable({ projects, users, onUpdateProject }: ProjectsTableProps) {
@@ -68,6 +77,7 @@ export function ProjectsTable({ projects, users, onUpdateProject }: ProjectsTabl
                 <TableHead className="w-[40px]"></TableHead>
                 <TableHead>Project Name</TableHead>
                 <TableHead>Members</TableHead>
+                <TableHead>Priority</TableHead>
                 <TableHead>Due Date</TableHead>
                 <TableHead className="w-[150px]">Progress</TableHead>
                 <TableHead className="w-[120px] text-right">Actions</TableHead>
@@ -76,7 +86,7 @@ export function ProjectsTable({ projects, users, onUpdateProject }: ProjectsTabl
             <TableBody>
               {projects.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
+                  <TableCell colSpan={7} className="h-24 text-center">
                     No projects found.
                   </TableCell>
                 </TableRow>
@@ -117,6 +127,11 @@ export function ProjectsTable({ projects, users, onUpdateProject }: ProjectsTabl
                           ))}
                         </div>
                       </TableCell>
+                       <TableCell>
+                        <Badge variant="secondary" className={cn(priorityBadgeVariant[project.priority])}>
+                          {project.priority}
+                        </Badge>
+                      </TableCell>
                       <TableCell>{format(project.dueDate, "MMM d, yyyy")}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
@@ -142,7 +157,7 @@ export function ProjectsTable({ projects, users, onUpdateProject }: ProjectsTabl
                     </TableRow>
                     {expandedRows.has(project.id) && (
                       <TableRow>
-                        <TableCell colSpan={6}>
+                        <TableCell colSpan={7}>
                           <div className="p-4 bg-muted/50 rounded-md">
                             <TasksList 
                               tasks={project.tasks} 
