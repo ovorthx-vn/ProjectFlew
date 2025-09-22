@@ -135,7 +135,7 @@ export function ProjectsTimeline({ projects }: ProjectsTimelineProps) {
                     </div>
 
                     {/* Projects */}
-                    <div className="relative pt-8">
+                    <div className="relative pt-12">
                     {projects.map((project, index) => {
                         const projectLeft = getPosition(project.startDate);
                         const projectWidth = getWidth(project.startDate, project.dueDate);
