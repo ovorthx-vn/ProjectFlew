@@ -17,9 +17,14 @@ import { cn } from '@/lib/utils';
 
 function AppBody({ children }: { children: React.ReactNode }) {
   const { font } = useFont();
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
-    <body className={cn("font-body antialiased", font.variable)}>
+    <body className={cn("font-body antialiased", isMounted ? font.variable : 'font-inter')}>
       <ThemeProvider defaultTheme="dark" storageKey="projectflow-theme">
         <UserProvider>
           <ProjectProvider>
