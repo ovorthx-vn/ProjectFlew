@@ -91,7 +91,7 @@ export default function DashboardPage() {
           <PopoverTrigger asChild>
             <div className="relative">
               {format(day, 'd')}
-              <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
+              <span className="absolute top-0 right-0 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
             </div>
           </PopoverTrigger>
           <PopoverContent className="w-80">

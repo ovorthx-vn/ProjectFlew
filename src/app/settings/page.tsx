@@ -188,7 +188,11 @@ export default function SettingsPage() {
                         <TableCell>
                            <Badge 
                                 variant={user.availability === 'Available' ? 'secondary' : 'default'}
-                                className={user.availability === 'Available' ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300' : user.availability === 'Busy' ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300' : 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300'}
+                                className={cn(
+                                    user.availability === 'Available' ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300' : 
+                                    user.availability === 'Busy' ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300' : 
+                                    'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300'
+                                )}
                             >
                                 {user.availability}
                             </Badge>
