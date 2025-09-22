@@ -10,8 +10,10 @@ import {
   LayoutGrid,
   Users as UsersIcon,
   User as UserIcon,
+  FolderKanban,
+  FileCheck,
 } from "lucide-react"
-import { format } from "date-fns"
+import { format, formatDistanceToNow, addDays, isAfter, isBefore, startOfToday } from "date-fns"
 
 import type { Project, User, Task } from "@/lib/types"
 import { cn } from "@/lib/utils"
@@ -45,10 +47,11 @@ import {
 import { Icons } from "@/components/icons"
 import { ProjectsView } from "@/components/dashboard/projects-view"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useUser } from "@/context/user-context"
 import { useProject } from "@/context/project-context"
+import { Separator } from "@/components/ui/separator"
 
 export default function DashboardPage() {
   const { users } = useUser();
@@ -68,6 +71,18 @@ export default function DashboardPage() {
   }, {} as Record<string, (Task & { project: string, projectId: string, projectDueDate: Date })[]>);
   
   const activeProjects = projects.filter(p => p.progress < 100);
+  
+  const today = startOfToday();
+  const nextWeek = addDays(today, 7);
+
+  const upcomingProjects = activeProjects.filter(p => 
+    p.dueDate && isAfter(p.dueDate, today) && isBefore(p.dueDate, nextWeek)
+  ).sort((a,b) => a.dueDate.getTime() - b.dueDate.getTime());
+
+  const upcomingTasks = allTasks.filter(t =>
+    t.dueDate && isAfter(t.dueDate, today) && isBefore(t.dueDate, nextWeek)
+  ).sort((a,b) => a.dueDate!.getTime() - b.dueDate!.getTime());
+
 
   const DayWithDot: React.FC<{day: Date}> = ({ day }) => {
     const dateStr = format(day, 'yyyy-MM-dd');
@@ -210,10 +225,58 @@ export default function DashboardPage() {
                 />
               </PopoverContent>
             </Popover>
-            <Button variant="ghost" size="icon">
-              <Bell className="h-5 w-5" />
-              <span className="sr-only">Notifications</span>
-            </Button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Bell className="h-5 w-5" />
+                  <span className="sr-only">Notifications</span>
+                  {(upcomingProjects.length > 0 || upcomingTasks.length > 0) && (
+                    <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-96">
+                <div className="space-y-4">
+                  <CardHeader className="p-2">
+                    <CardTitle>Notifications</CardTitle>
+                    <CardDescription>Upcoming deadlines in the next 7 days.</CardDescription>
+                  </CardHeader>
+                  <div className="space-y-4">
+                    {upcomingProjects.length > 0 && (
+                      <div className="space-y-2">
+                          <h4 className="font-medium text-sm flex items-center gap-2 px-2"><FolderKanban className="h-4 w-4"/> Upcoming Project Deadlines</h4>
+                          <div className="space-y-2">
+                              {upcomingProjects.map(project => (
+                                  <div key={project.id} className="text-sm px-2 py-1.5 rounded-md hover:bg-accent">
+                                    <p className="font-semibold">{project.name}</p>
+                                    <p className="text-muted-foreground text-xs">Due in {formatDistanceToNow(project.dueDate)}</p>
+                                  </div>
+                              ))}
+                          </div>
+                      </div>
+                    )}
+                    {upcomingProjects.length > 0 && upcomingTasks.length > 0 && <Separator />}
+                    {upcomingTasks.length > 0 && (
+                      <div className="space-y-2">
+                          <h4 className="font-medium text-sm flex items-center gap-2 px-2"><FileCheck className="h-4 w-4"/> Upcoming Task Deadlines</h4>
+                          <div className="space-y-2">
+                              {upcomingTasks.map(task => (
+                                  <div key={task.id} className="text-sm px-2 py-1.5 rounded-md hover:bg-accent">
+                                    <p className="font-semibold">{task.title}</p>
+                                    <p className="text-muted-foreground text-xs">Project: {task.project}</p>
+                                    <p className="text-muted-foreground text-xs">Due in {formatDistanceToNow(task.dueDate!)}</p>
+                                  </div>
+                              ))}
+                          </div>
+                      </div>
+                    )}
+                    {upcomingProjects.length === 0 && upcomingTasks.length === 0 && (
+                        <p className="text-sm text-muted-foreground text-center py-4">No upcoming deadlines.</p>
+                    )}
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
             <ThemeToggle />
           </div>
         </header>
