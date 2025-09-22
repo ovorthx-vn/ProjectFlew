@@ -6,6 +6,7 @@ import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from "@/components/ui/toaster";
 import { UserProvider } from '@/context/user-context';
+import { ProjectProvider } from '@/context/project-context';
 
 // export const metadata: Metadata = {
 //   title: 'ProjectFlow',
@@ -29,7 +30,9 @@ export default function RootLayout({
       <body className="font-body antialiased">
         <ThemeProvider defaultTheme="dark" storageKey="projectflow-theme">
           <UserProvider>
-            {children}
+            <ProjectProvider>
+              {children}
+            </ProjectProvider>
           </UserProvider>
           <Toaster />
         </ThemeProvider>

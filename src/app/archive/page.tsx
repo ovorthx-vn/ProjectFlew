@@ -10,7 +10,6 @@ import {
   Users as UsersIcon,
 } from "lucide-react"
 
-import { projects as initialProjects } from "@/lib/data"
 import type { Project, User } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -38,26 +37,11 @@ import { Icons } from "@/components/icons"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { ArchivedProjectsTable } from "@/components/archive/archived-projects-table"
-import { useUser } from "@/context/user-context"
+import { useProject } from "@/context/project-context"
 
 export default function ArchivePage() {
-  const { users } = useUser();
-  const [projects, setProjects] = React.useState<Project[]>(initialProjects);
+  const { projects } = useProject();
   const [isCollapsed, setIsCollapsed] = React.useState(false)
-
-  React.useEffect(() => {
-    if (!users) return;
-    setProjects(currentProjects => {
-      return currentProjects.map(p => ({
-        ...p,
-        members: p.members.map(m => users.find(u => u.id === m.id) || m),
-        tasks: p.tasks.map(t => ({
-          ...t,
-          assigned: t.assigned.map(a => users.find(u => u.id === a.id) || a)
-        }))
-      }));
-    });
-  }, [users]);
 
   const archivedProjects = projects.filter(p => p.progress >= 100);
 

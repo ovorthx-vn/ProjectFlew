@@ -13,7 +13,6 @@ import {
 } from "lucide-react"
 import { format } from "date-fns"
 
-import { projects as initialProjects } from "@/lib/data"
 import type { Project, User, Task } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -49,40 +48,12 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useUser } from "@/context/user-context"
+import { useProject } from "@/context/project-context"
 
 export default function DashboardPage() {
   const { users } = useUser();
-  const [projects, setProjects] = React.useState<Project[]>(initialProjects);
+  const { projects, addProject, updateProject } = useProject();
   const [isCollapsed, setIsCollapsed] = React.useState(false)
-
-  const addProject = (project: Omit<Project, 'id' | 'createdAt' | 'tasks' | 'progress'>) => {
-    const newProject: Project = {
-      ...project,
-      id: `proj-${Date.now()}`,
-      createdAt: new Date(),
-      tasks: [],
-      progress: 0,
-    };
-    setProjects(prev => [newProject, ...prev]);
-  };
-
-  const updateProject = (updatedProject: Project) => {
-    setProjects(prev => prev.map(p => p.id === updatedProject.id ? updatedProject : p));
-  }
-
-  React.useEffect(() => {
-    if (!users) return;
-    setProjects(currentProjects => {
-      return currentProjects.map(p => ({
-        ...p,
-        members: p.members.map(m => users.find(u => u.id === m.id) || m),
-        tasks: p.tasks.map(t => ({
-          ...t,
-          assigned: t.assigned.map(a => users.find(u => u.id === a.id) || a)
-        }))
-      }));
-    });
-  }, [users]);
   
   const allTasks = projects.flatMap(p => p.tasks.map(t => ({...t, project: p.name, projectId: p.id, projectDueDate: p.dueDate})));
   const tasksByDueDate = allTasks.reduce((acc, task) => {
@@ -108,7 +79,7 @@ export default function DashboardPage() {
           <PopoverTrigger asChild>
             <div className="relative">
               {format(day, 'd')}
-              <span className="absolute top-0 right-0 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
+              <span className="absolute top-0 right-0 w-1.5 h-1.5 bg-primary rounded-full"></span>
             </div>
           </PopoverTrigger>
           <PopoverContent className="w-80">
@@ -249,7 +220,7 @@ export default function DashboardPage() {
           </div>
         </header>
         <main className="flex-1 p-4 sm:p-6">
-            <ProjectsView projects={activeProjects} users={users} onAddProject={addProject} onUpdateProject={updateProject} />
+            <ProjectsView projects={activeProjects} users={users || []} onAddProject={addProject} onUpdateProject={updateProject} />
         </main>
       </SidebarInset>
     </SidebarProvider>
