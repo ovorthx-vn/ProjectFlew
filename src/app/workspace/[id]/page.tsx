@@ -56,7 +56,7 @@ export default function WorkspaceDetailPage({ params }: { params: { id: string }
   React.useEffect(() => {
     const foundWorkspace = workspaces.find(ws => ws.id === params.id);
     setWorkspace(foundWorkspace || null);
-  }, [params.id]);
+  }, [params]);
 
   if (!workspace) {
     return (
