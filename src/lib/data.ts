@@ -8,6 +8,26 @@ export const users: User[] = [
   { id: 'user-5', name: 'Ava Jones', avatar: 'https://picsum.photos/seed/user5/40/40', role: 'QA Tester', availability: 'Available' },
 ];
 
+const ecommerceMindMap = `- E-commerce Platform
+	- User Authentication
+		- Login/Register pages
+		- Password reset
+	- Product Catalog
+		- Product page design
+		- Search and filtering
+		- Categories
+	- Shopping Cart
+		- Add to cart functionality
+		- View cart
+	- Checkout
+		- Shipping information
+		- Payment integration
+			- Stripe
+			- PayPal
+	- Backend
+		- Database schema
+		- REST APIs`;
+
 export const projects: Project[] = [
   {
     id: 'proj-1',
@@ -16,7 +36,7 @@ export const projects: Project[] = [
     progress: 75,
     members: [users[0], users[1], users[2]],
     notes: 'Initial notes for the e-commerce platform project.',
-    mindMapUrl: 'https://picsum.photos/seed/mindmap1/800/600',
+    mindMap: ecommerceMindMap,
     createdAt: new Date('2024-03-01'),
     tasks: [
       { id: 'task-1-1', title: 'Design product page', status: 'Done', assigned: [users[2]], dueDate: new Date('2024-07-20') },
@@ -48,7 +68,6 @@ export const projects: Project[] = [
     progress: 100,
     members: [users[1], users[2], users[4]],
     createdAt: new Date('2024-06-20'),
-    mindMapUrl: 'https://picsum.photos/seed/mindmap1/800/600',
     tasks: [
       { id: 'task-3-1', title: 'API for data aggregation', status: 'Done', assigned: [users[1]] },
       { id: 'task-3-2', title: 'Real-time chart components', status: 'Done', assigned: [users[0]] },

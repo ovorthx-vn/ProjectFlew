@@ -1,19 +1,24 @@
 "use client"
 
-import type { Project } from "@/lib/types"
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 interface MindMapEditorProps {
-    project: Project
+    value: string;
+    onChange: (value: string) => void;
 }
 
-export function MindMapEditor({ project }: MindMapEditorProps) {
+export function MindMapEditor({ value, onChange }: MindMapEditorProps) {
     return (
-        <div className="w-full h-full rounded-lg border-2 border-dashed border-muted-foreground flex items-center justify-center">
-            <div className="text-center text-muted-foreground">
-                <h3 className="text-lg font-semibold">Mind Map Editor</h3>
-                <p className="text-sm">A full mind map editor can be implemented here.</p>
-                <p className="text-xs mt-2">(This is currently a placeholder)</p>
-            </div>
+        <div className="w-full h-full flex flex-col gap-2">
+            <Label htmlFor="mindmap-editor" className="text-sm font-medium">Editor</Label>
+            <Textarea
+                id="mindmap-editor"
+                placeholder="Start your mind map here...&#10;- Main Idea&#10;&#9;- Sub Idea 1&#10;&#9;&#9;- Detail A&#10;&#9;- Sub Idea 2"
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                className="w-full flex-grow rounded-lg border-2 border-dashed border-muted-foreground p-4 h-48"
+            />
         </div>
     )
 }

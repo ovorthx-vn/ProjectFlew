@@ -23,6 +23,6 @@ export type Project = {
   tasks: Task[];
   members: User[];
   notes?: string;
-  mindMapUrl?: string;
+  mindMap?: string;
   createdAt: Date;
 };
