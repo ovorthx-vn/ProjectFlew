@@ -315,8 +315,8 @@ function WorkspaceDetail({ id }: { id: string }) {
                                 <CardTitle className="flex items-center gap-2"><LinkIcon /> Documents</CardTitle>
                                 <CardDescription>Relevant links and documents.</CardDescription>
                             </div>
-                            <Button variant="ghost" size="icon" onClick={() => setIsAddDocumentLinkDialogOpen(true)}>
-                                <PlusCircle className="h-4 w-4" />
+                            <Button variant="outline" size="sm" onClick={() => setIsAddDocumentLinkDialogOpen(true)}>
+                                Add
                             </Button>
                         </CardHeader>
                         <CardContent>
