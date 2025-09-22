@@ -10,9 +10,14 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['Inter', 'sans-serif'],
+        body: ['var(--font-body)', 'Inter', 'sans-serif'],
         headline: ['"Space Grotesk"', 'sans-serif'],
         code: ['monospace'],
+        inter: ['Inter', 'sans-serif'],
+        roboto: ['Roboto', 'sans-serif'],
+        montserrat: ['Montserrat', 'sans-serif'],
+        'be-vietnam-pro': ['"Be Vietnam Pro"', 'sans-serif'],
+        quicksand: ['Quicksand', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',

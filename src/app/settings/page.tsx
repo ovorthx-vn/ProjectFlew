@@ -8,11 +8,8 @@ import {
   Settings,
   User as UserIcon,
   Users as UsersIcon,
-  MoreHorizontal,
-  PlusCircle
 } from "lucide-react"
 
-import type { User } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -38,16 +35,21 @@ import {
 import { Icons } from "@/components/icons"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { CreateMemberDialog } from "@/components/settings/create-member-dialog"
-import { useUser } from "@/context/user-context"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useFont, AppFont } from "@/context/font-context"
+import { Label } from "@/components/ui/label"
+
 
 export default function SettingsPage() {
-  const { users, addUser } = useUser();
   const [isCollapsed, setIsCollapsed] = React.useState(false)
-  const [isCreateMemberOpen, setIsCreateMemberOpen] = React.useState(false)
+  const { font, setFont, availableFonts } = useFont();
+
+  const handleFontChange = (fontName: string) => {
+    const newFont = availableFonts.find(f => f.name === fontName);
+    if (newFont) {
+      setFont(newFont);
+    }
+  };
 
   return (
     <SidebarProvider defaultOpen onOpenChange={(open) => setIsCollapsed(!open)}>
@@ -142,77 +144,30 @@ export default function SettingsPage() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <div className="flex justify-between items-center">
-                    <div>
-                        <CardTitle>Team Members</CardTitle>
-                        <CardDescription>Manage your team members here.</CardDescription>
-                    </div>
-                    <Button onClick={() => setIsCreateMemberOpen(true)}>
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        Add Member
-                    </Button>
-                </div>
+                <CardTitle>Appearance</CardTitle>
+                <CardDescription>Customize the look and feel of the application.</CardDescription>
               </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Role</TableHead>
-                      <TableHead>Availability</TableHead>
-                      <TableHead><span className="sr-only">Actions</span></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {users && users.map((user) => (
-                      <TableRow key={user.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Avatar>
-                              <AvatarImage src={user.avatar} alt={user.name} />
-                              <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            {user.name}
-                          </div>
-                        </TableCell>
-                        <TableCell>{user.role}</TableCell>
-                        <TableCell>
-                           <Badge 
-                                variant={user.availability === 'Available' ? 'secondary' : 'default'}
-                                className={cn(
-                                    user.availability === 'Available' ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300' : 
-                                    user.availability === 'Busy' ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300' : 
-                                    'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300'
-                                )}
-                            >
-                                {user.availability}
-                            </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuItem>Edit</DropdownMenuItem>
-                              <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+              <CardContent className="space-y-4">
+                 <div className="space-y-2">
+                    <Label htmlFor="font-select">Font</Label>
+                    <Select value={font.name} onValueChange={handleFontChange}>
+                        <SelectTrigger id="font-select" className="w-[280px]">
+                            <SelectValue placeholder="Select a font" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {availableFonts.map((f) => (
+                                <SelectItem key={f.name} value={f.name}>
+                                    {f.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                 </div>
               </CardContent>
             </Card>
           </div>
         </main>
       </SidebarInset>
-      <CreateMemberDialog isOpen={isCreateMemberOpen} onClose={() => setIsCreateMemberOpen(false)} onAddMember={(newUserData) => addUser({...newUserData, avatar: `https://picsum.photos/seed/user${Date.now()}/40/40`})} />
     </SidebarProvider>
   )
 }
