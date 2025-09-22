@@ -43,14 +43,10 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { EditMemberDialog } from "@/components/team/edit-member-dialog"
 import { CreateMemberDialog } from "@/components/settings/create-member-dialog"
+import { useUser } from "@/context/user-context"
 
-interface TeamPageProps {
-  users: User[];
-  addUser: (user: Omit<User, 'id' | 'avatar'>) => void;
-  updateUser: (user: User) => void;
-}
-
-export default function TeamPage({ users, addUser, updateUser }: TeamPageProps) {
+export default function TeamPage() {
+  const { users, addUser, updateUser } = useUser();
   const [isCollapsed, setIsCollapsed] = React.useState(false)
   const [editingUser, setEditingUser] = React.useState<User | null>(null);
   const [isCreateMemberOpen, setIsCreateMemberOpen] = React.useState(false)

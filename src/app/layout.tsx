@@ -5,8 +5,7 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from "@/components/ui/toaster";
-import { users as initialUsers } from "@/lib/data"
-import type { User } from "@/lib/types"
+import { UserProvider } from '@/context/user-context';
 
 // export const metadata: Metadata = {
 //   title: 'ProjectFlow',
@@ -18,29 +17,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [users, setUsers] = React.useState<User[]>(initialUsers);
-  
-  const addUser = (user: Omit<User, 'id' | 'avatar'>) => {
-    const newUser: User = {
-      ...user,
-      id: `user-${Date.now()}`,
-      avatar: `https://picsum.photos/seed/user${Date.now()}/40/40`,
-    }
-    setUsers(prev => [newUser, ...prev]);
-  }
-
-  const updateUser = (updatedUser: User) => {
-    setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
-  }
-  
-  const childrenWithProps = React.Children.map(children, child => {
-    if (React.isValidElement(child)) {
-      // @ts-ignore
-      return React.cloneElement(child, { users, addUser, updateUser });
-    }
-    return child;
-  });
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -52,7 +28,9 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <ThemeProvider defaultTheme="dark" storageKey="projectflow-theme">
-          {childrenWithProps}
+          <UserProvider>
+            {children}
+          </UserProvider>
           <Toaster />
         </ThemeProvider>
       </body>

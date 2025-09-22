@@ -48,8 +48,10 @@ import { ProjectsView } from "@/components/dashboard/projects-view"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { useUser } from "@/context/user-context"
 
-export default function DashboardPage({ users }: { users: User[] }) {
+export default function DashboardPage() {
+  const { users } = useUser();
   const [projects, setProjects] = React.useState<Project[]>(initialProjects);
   const [isCollapsed, setIsCollapsed] = React.useState(false)
 

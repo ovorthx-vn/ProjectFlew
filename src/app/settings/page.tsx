@@ -42,13 +42,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { CreateMemberDialog } from "@/components/settings/create-member-dialog"
+import { useUser } from "@/context/user-context"
 
-interface SettingsPageProps {
-  users: User[];
-  addUser: (user: Omit<User, 'id' | 'avatar'>) => void;
-}
-
-export default function SettingsPage({ users, addUser }: SettingsPageProps) {
+export default function SettingsPage() {
+  const { users, addUser } = useUser();
   const [isCollapsed, setIsCollapsed] = React.useState(false)
   const [isCreateMemberOpen, setIsCreateMemberOpen] = React.useState(false)
 
